@@ -1,3 +1,5 @@
+#coding: utf-8
+
 from flask import render_template, redirect, url_for, flash
 from application import app, bcrypt, db
 from application.forms import RegistrationForm, LoginForm
@@ -45,4 +47,3 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for('home'))
-
