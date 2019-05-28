@@ -27,7 +27,9 @@
           <div class="collapse navbar-collapse" id="navbarNav">
             <div class="navbar-nav">
               {% if current_user.is_authenticated %}
-                <a class="nav-item nav-link" href="{{ url_for('logout') }}">Logout</a>
+                <a class="nav-item nav-link" href="{{ url_for('home') }}">Disciplinas</a>
+                <a class="nav-item nav-link" href="{{ url_for('teacher') }}">Professores</a>
+                <a class="nav-item nav-link" href="{{ url_for('logout') }}">Sair</a>
               {% endif %}
                 {% block navbar %}{% endblock %}
             </div>
@@ -49,6 +51,52 @@
           {% block content %}{% endblock %}
         </div>
     </div>
+
+    <h2>Disciplinas em curso</h2>
+    <hr width="100%">
+    {% for subject in subjects %}
+      {% if (loop.index)%2 == 0 %}
+        <div class="card text-black bg-light mb-3" style="max-width: 1200px;">
+          <div class="row no-gutters">
+            <div class="col-md-7">
+              <div class="row no-gutters">
+              <div class="card-body">
+                <p class="card-text"><strong>{{subject.code}}</strong>: {{subject.name}}</p>
+              </div>
+              </div>
+            </div>
+            <div class="col-md-5">
+              <div class="card-body">
+                {% for teacher in subject.teachers %}
+                    {% set displayName = "Prof. " + teacher.name %}
+                    <p><a href="{{ url_for('teacher', routeIdentifier=teacher.routeIdentifier) }}" class="card-text">{{displayName}}</a></p>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        </div>
+      {% else %}
+        <div class="card text-white bg-dark mb-3" style="max-width: 1200px;">
+          <div class="row no-gutters">
+            <div class="col-md-7">
+              <div class="row no-gutters">
+              <div class="card-body">
+                <p class="card-text"><strong>{{subject.code}}</strong>: {{subject.name}}</p>
+              </div>
+              </div>
+            </div>
+            <div class="col-md-5">
+              <div class="card-body">
+                {% for teacher in subject.teachers %}
+                    {% set displayName = "Prof. " + teacher.name %}
+                    <p><a href="{{ url_for('teacher', routeIdentifier=teacher.routeIdentifier) }}" class="card-text">{{displayName}}</a></p>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+  {% endfor %}
 
     </main>
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>

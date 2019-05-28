@@ -28,3 +28,6 @@ class LoginForm(FlaskForm):
     password = PasswordField('Senha', validators=[DataRequired()])
     remember = BooleanField('Lembrar de mim')
     submit = SubmitField('Login')
+
+class SearchForm(FlaskForm):
+    search = StringField('search', validators=[DataRequired()])
