@@ -40,14 +40,14 @@
                 <div class="form-group">
                     {{ form.classITA.label(class="form-control-label") }}
                     {% if form.classITA.errors %}
-                        {{ form.classITA(class="form-control form-control-lg is-invalid") }}
+                        {{ form.classITA(class="custom-select custom-select-lg is-invalid") }}
                         <div class="invalid-feedback">
                             {% for error in form.classITA.errors %}
                                 <span>{{ error }}</span>
                             {% endfor %}
                         </div>
                     {% else %}
-                        {{ form.classITA(class="form-control form-control-lg") }}
+                        {{ form.classITA(class="custom-select custom-select-lg") }}
                     {% endif %}
                 </div>
                 <div class="form-group">
