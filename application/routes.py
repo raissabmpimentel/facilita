@@ -78,7 +78,6 @@ def teacherSearch():
         form = SearchForm()
         teacher = Teacher.query.filter(Teacher.name.contains(form.search.data)).first()
         if teacher:
-            print('Entrei!')
             subjects = ""
             for subject in teacher.subjects:
                 if subjects != "":
