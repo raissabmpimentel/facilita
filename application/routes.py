@@ -77,11 +77,15 @@ def teacherSearch():
     if current_user.is_authenticated:
         form = SearchForm()
         teacher = Teacher.query.filter(Teacher.name.contains(form.search.data)).first()
+        if teacher:
+            print('Entrei!')
+            subjects = ""
+            for subject in teacher.subjects:
+                if subjects != "":
+                    subjects = subjects + ", "
+                subjects = subjects + subject.code
 
-        subjects = ""
-        for subject in teacher.subjects:
-            if subjects != "":
-                subjects = subjects + ", "
-            subjects = subjects + subject.code
-
-        return render_template('teacher.html', teacher=teacher, subjects=subjects)
+            return render_template('teacher.html', teacher=teacher, subjects=subjects)
+        else:
+            flash('Professor não encontrado!', 'danger')
+            return redirect(url_for('teacher'))
