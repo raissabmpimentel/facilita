@@ -1,7 +1,6 @@
 import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-import flask_whooshalchemy as whooshalchemy
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from flask_heroku import Heroku
