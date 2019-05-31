@@ -6,6 +6,8 @@ from flask_migrate import Migrate
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+subjectStudentAssociation = db.Table('subject-student association', db.Column('subjectId', db.Integer, db.ForeignKey('subject.id')), db.Column('studentId', db.Integer, db.ForeignKey('user.id')))
+
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), unique=True, nullable=False)
@@ -13,6 +15,7 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(60), nullable=False)
     classITA = db.Column(db.String(20), nullable=False)
     isRepr = db.Column(db.Boolean, nullable=False)
+    subjects = db.relationship('Subject', secondary=subjectStudentAssociation, backref=db.backref('students', lazy = 'dynamic'))
     def __repr__(self):
         return f"User('{self.username}', '{self.email}')"
 

@@ -14,7 +14,7 @@ from application.models import User, Teacher, Subject
 @app.route("/subjects")
 def home():
     if current_user.is_authenticated:
-        subjects = Subject.query.filter_by(classITA=current_user.classITA).order_by(Subject.code).all()
+        subjects = Subject.query.filter(Subject.students.any(User.id.in_([student.id for student in current_user.subjects]))).all()
         return render_template('subjects.html', subjects=subjects)
     else:
         return redirect(url_for('login'))
@@ -28,6 +28,9 @@ def register():
         hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
         user = User(name=form.name.data, email=form.email.data, password=hashed_password, classITA=form.classITA.data, isRepr=form.isRepr.data)
         db.session.add(user)
+
+        for subject in Subject.query.filter_by(classITA=user.classITA).all():
+            user.subjects.append(subject)
         db.session.commit()
         flash('Sua conta foi criada! Agora você pode ingressar no sistema.', 'success')
         return redirect(url_for('home'))

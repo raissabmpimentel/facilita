@@ -11,7 +11,8 @@ class RegistrationForm(FlaskForm):
     choices = [('COMP19','COMP-19'),('AER19','AER-19'),('AESP19','AESP-19'),('ELE19','ELE-19'),('CIVIL19','CIVIL-19'),('MEC19','MEC-19'),
     ('COMP20','COMP-20'),('AER20','AER-20'),('AESP20','AESP-20'),('ELE20','ELE-20'),('CIVIL20','CIVIL-20'),('MEC20','MEC-20'),
     ('COMP21','COMP-21'),('AER21','AER-21'),('AESP21','AESP-21'),('ELE20','ELE-21'),('CIVIL21','CIVIL-21'),('MEC21','MEC-21'),
-    ('FUND22','FUND-22'),('FUND23','FUND-23')]
+    ('FUND221','FUND-22.1'),('FUND222','FUND-22.2'), ('FUND223','FUND-22.3'), ('FUND224','FUND-22.4'),
+    ('FUND231','FUND-23.1'),('FUND232','FUND-23.2'), ('FUND233','FUND-23.3'), ('FUND234','FUND-23.4')]
     name = StringField('Nome',
                validators=[DataRequired(), Length(min=4, max=120)])
     email = StringField('Email',
