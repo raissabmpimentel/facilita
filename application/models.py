@@ -28,8 +28,7 @@ class Subject(db.Model):
     teachers = db.relationship('Teacher', secondary=subjectTeacherAssociation, backref=db.backref('subjects', lazy = 'dynamic'))
     classITA = db.Column(db.String(20), nullable=False)
 
-    def __init__(self, id, code, name, classITA):
-        self.id = id
+    def __init__(self, code, name, classITA):
         self.code = code
         self.name = name
         self.classITA = classITA
@@ -45,8 +44,7 @@ class Teacher(db.Model):
     room = db.Column(db.String(120), nullable=False)
     ramal = db.Column(db.Integer, nullable=False)
 
-    def __init__(self, id, routeIdentifier, name, email, room, ramal):
-        self.id = id
+    def __init__(self, routeIdentifier, name, email, room, ramal):
         self.routeIdentifier = routeIdentifier
         self.name = name
         self.email = email
