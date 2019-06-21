@@ -1,9 +1,11 @@
 import os
-from flask import Flask
+from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from flask_heroku import Heroku
+from sqlalchemy import create_engine, and_, text
+from sqlalchemy.orm import sessionmaker
 
 
 app = Flask(__name__)

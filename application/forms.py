@@ -6,7 +6,6 @@ from wtforms import StringField, PasswordField, SubmitField, BooleanField, Selec
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from application.models import User
 
-
 class RegistrationForm(FlaskForm):
     choices = [('COMP19','COMP-19'),('AER19','AER-19'),('AESP19','AESP-19'),('ELE19','ELE-19'),('CIVIL19','CIVIL-19'),('MEC19','MEC-19'),
     ('COMP20','COMP-20'),('AER20','AER-20'),('AESP20','AESP-20'),('ELE20','ELE-20'),('CIVIL20','CIVIL-20'),('MEC20','MEC-20'),
@@ -37,5 +36,17 @@ class LoginForm(FlaskForm):
     remember = BooleanField('Lembrar de mim')
     submit = SubmitField('Login')
 
-class SearchForm(FlaskForm):
-    search = StringField('search', validators=[DataRequired()])
+class TeacherSearchForm(FlaskForm):
+    teacher = StringField('Nome do professor', validators=[DataRequired()], render_kw={"placeholder": "Digite o nome do professor"})
+    submit = SubmitField('Buscar')
+
+class SubjectSearchForm(FlaskForm):
+    #choices = [('name', 'Nome da disciplina'), ('code', 'Sigla da disciplina'), ('teacher', 'Nome do professor')]
+    choices = [('name', 'Nome da disciplina'), ('code', 'Sigla da disciplina')]
+    typeOfSearch = SelectField('Tipo de Busca', choices=choices, validators=[DataRequired()])
+    subject = StringField('Nome da disciplina', validators=[DataRequired()], render_kw={"placeholder": "Digite o nome da disciplina"})
+    submit = SubmitField('Buscar')
+
+class AddSubjectForm(FlaskForm):
+    subject = StringField('Nome da disciplina')
+    submit = SubmitField('Buscar')

@@ -1,0 +1,49 @@
+{% extends "layout.html" %}
+{% block navbar %}
+  {% if current_user.is_authenticated %}
+    <a class="nav-item nav-link" href="{{ url_for('home') }}">Disciplinas</a>
+    <a class="nav-item nav-link" href="{{ url_for('teacher') }}">Professores</a>
+  {% endif %}
+{% endblock navbar %}
+
+{% block content %}
+
+<div style="display: flex;">
+<div>
+  <h2>Professor</h2>
+</div>
+<div style="margin-left: auto;">
+<form method="POST" action="" class="form-inline my-2 my-lg-0">
+  {{ form.hidden_tag() }}
+  <fieldset>
+        {% if form.teacher.errors %}
+            {{ form.teacher(class="form-control mr-sm-2") }}
+            <div class="invalid-feedback">
+                {% for error in form.teacher.errors %}
+                    <span>{{ error }}</span>
+                {% endfor %}
+            </div>
+        {% else %}
+            {{ form.teacher(class="form-control mr-sm-2") }}
+        {% endif %}
+        {{ form.submit(class="btn btn-outline-secondary my-2 my-sm-0") }}
+  </fieldset>
+</form>
+</div>
+</div>
+<hr width="100%">
+
+  <div>
+    <p style="font-size:20px; margin-bottom: 20px;">Selecione o professor que você está procurando:</p>
+  </div>
+
+  <div>
+    {% for teacher in teachers %}
+      {% if (loop.index)%2 == 0 %}
+        <a href="{{ url_for('teacher', routeIdentifier=teacher.routeIdentifier) }}" class="btn btn-light btn-lg btn-block" style="height: 50px; max-width: 1200px; color:black; text-align:left; font-size:18px"><strong>Prof.</strong> {{teacher.name}}</a>
+      {% else %}
+        <a href="{{ url_for('teacher', routeIdentifier=teacher.routeIdentifier) }}" class="btn btn-dark btn-lg btn-block" style="height: 50px; max-width: 1200px; color:white; text-align:left; font-size:18px"><strong>Prof.</strong> {{teacher.name}}</a>
+      {% endif %}
+  {% endfor %}
+  </div>
+{% endblock content %}
