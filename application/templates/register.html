@@ -1,8 +1,4 @@
-{% extends "layout.html" %}
-{% block navbar %}
-    <a class="nav-item nav-link" href="{{ url_for('login') }}">Login</a>
-    <a class="nav-item nav-link active" href="{{ url_for('register') }}">Cadastro</a>
-{% endblock navbar %}
+{% extends "navbarloginregister.html" %}
 
 {% block content %}
 	<div class="content-section" style="margin-top: 10px;">

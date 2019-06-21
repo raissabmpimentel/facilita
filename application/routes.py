@@ -56,6 +56,8 @@ def addSubjects():
                 subjectsAux = Subject.query.filter(Subject.name.contains(form.subject.data)).all()
             elif form.typeOfSearch.data == 'code':
                 subjectsAux = Subject.query.filter(Subject.code.contains(form.subject.data)).all()
+            elif form.typeOfSearch.data == 'class':
+                subjectsAux = Subject.query.filter(Subject.classITA.contains(form.subject.data)).all()
             # else:
                 # subjectsAux = Subject.query.filter(Subject.teachers.contains(form.subject.data)).all()
 
@@ -68,7 +70,9 @@ def addSubjects():
                             break
                     if not foundUser:
                         subjects.append(subject)
-            if not subjects:
+                if not subjects:
+                    flash('Você está cursando todas as disciplina encontradas com a palavra-chave buscada.', 'warning')
+            else:
                 flash('Disciplina não encontrada', 'danger')
         return render_template('addsubjects.html', subjects=subjects, form=form)
     else:
@@ -78,7 +82,6 @@ def addSubjects():
 @app.route("/addingsubjects/<subjectCode>", methods=['GET', 'POST'])
 def addingSubjects(subjectCode):
     if current_user.is_authenticated:
-        print('chegou aqui')
         if subjectCode:
             subject = Subject.query.filter_by(code=subjectCode).first()
             subject.students.append(current_user)

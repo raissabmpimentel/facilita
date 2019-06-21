@@ -1,10 +1,4 @@
-{% extends "layout.html" %}
-{% block navbar %}
-  {% if current_user.is_authenticated %}
-    <a class="nav-item nav-link" href="{{ url_for('home') }}">Disciplinas</a>
-    <a class="nav-item nav-link" href="{{ url_for('teacher') }}">Professores</a>
-  {% endif %}
-{% endblock navbar %}
+{% extends "navbarmenu.html" %}
 
 {% block content %}
 

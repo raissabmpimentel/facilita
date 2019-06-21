@@ -42,7 +42,7 @@ class TeacherSearchForm(FlaskForm):
 
 class SubjectSearchForm(FlaskForm):
     #choices = [('name', 'Nome da disciplina'), ('code', 'Sigla da disciplina'), ('teacher', 'Nome do professor')]
-    choices = [('name', 'Nome da disciplina'), ('code', 'Sigla da disciplina')]
+    choices = [('name', 'Nome da disciplina'), ('code', 'Sigla da disciplina'), ('class', 'Turma')]
     typeOfSearch = SelectField('Tipo de Busca', choices=choices, validators=[DataRequired()])
     subject = StringField('Nome da disciplina', validators=[DataRequired()], render_kw={"placeholder": "Digite o nome da disciplina"})
     submit = SubmitField('Buscar')
