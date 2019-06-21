@@ -46,6 +46,18 @@ def editSubjects():
     else:
         return redirect(url_for('login'))
 
+def showAllSubjectsButTheOnesUserIsFollowing(subjectsAux):
+    subjects = []
+    for subject in subjectsAux:
+        foundUser = False
+        for student in subject.students:
+            if student.id == current_user.id:
+                foundUser = True
+                break
+        if not foundUser:
+            subjects.append(subject)
+    return subjects
+
 @app.route("/addsubjects", methods=['GET', 'POST'])
 def addSubjects():
     if current_user.is_authenticated:
@@ -60,21 +72,19 @@ def addSubjects():
                 subjectsAux = Subject.query.filter(Subject.classITA.contains(form.subject.data)).all()
             # else:
                 # subjectsAux = Subject.query.filter(Subject.teachers.contains(form.subject.data)).all()
-
             if subjectsAux:
-                for subject in subjectsAux:
-                    foundUser = False
-                    for student in subject.students:
-                        if student.id == current_user.id:
-                            foundUser = True
-                            break
-                    if not foundUser:
-                        subjects.append(subject)
+                subjects = showAllSubjectsButTheOnesUserIsFollowing(subjectsAux)
                 if not subjects:
                     flash('Você está cursando todas as disciplina encontradas com a palavra-chave buscada.', 'warning')
             else:
                 flash('Disciplina não encontrada', 'danger')
-        return render_template('addsubjects.html', subjects=subjects, form=form)
+            return render_template('addsubjects.html', subjects=subjects, form=form)
+        else:
+            subjectsAux = Subject.query.all()
+            subjects = showAllSubjectsButTheOnesUserIsFollowing(subjectsAux)
+            if not subjects:
+                flash('Você está cursando todas as disciplina encontradas com a palavra-chave buscada.', 'warning')
+            return render_template('addsubjects.html', subjects=subjects, form=form)
     else:
         return redirect(url_for('login'))
 
