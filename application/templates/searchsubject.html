@@ -1,0 +1,37 @@
+{% extends "navbarmenu.html" %}
+
+{% block content %}
+  {% block title %}{% endblock %}
+
+  <div>
+  <form method="POST" action="" class="form-inline my-2 my-lg-0">
+    {{ form.hidden_tag() }}
+    <fieldset>
+        {% if form.typeOfSearch.errors %}
+            {{ form.typeOfSearch(class="btn btn-secondary dropdown-toggle") }}
+            <div class="invalid-feedback">
+                {% for error in form.typeOfSearch.errors %}
+                    <span>{{ error }}</span>
+                {% endfor %}
+            </div>
+        {% else %}
+            {{ form.typeOfSearch(class="btn btn-secondary dropdown-toggle") }}
+        {% endif %}
+        {% if form.subject.errors %}
+            {{ form.subject(class="form-control") }}
+            <div class="invalid-feedback">
+                {% for error in form.teacher.errors %}
+                    <span>{{ error }}</span>
+                {% endfor %}
+            </div>
+        {% else %}
+            {{ form.subject(class="form-control") }}
+        {% endif %}
+        {{ form.submit(class="btn btn-outline-secondary my-2 my-sm-0") }}
+    </fieldset>
+  </div>
+
+  <hr width="0%">
+
+  {% block restofhtml %}{% endblock %}
+{% endblock content %}

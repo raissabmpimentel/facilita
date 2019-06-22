@@ -1,0 +1,49 @@
+{% extends "searchsubject.html" %}
+
+{% block title %}
+  <div>
+    <h2>Disciplinas disponíveis para avaliação</h2>
+  </div>
+  <hr width="100%">
+{% endblock title %}
+
+{% block restofhtml %}
+<div>
+  <p style="font-size:20px; margin-bottom: 20px;">Selecione uma disciplina para avaliar:</p>
+</div>
+  <div>
+    {% for subject in subjects %}
+      {% if (loop.index)%2 == 0 %}
+        <div class="card text-black bg-light mb-3" style="max-width: 1200px;">
+          <div style="display: flex;">
+          <div>
+            <div class="card-body">
+              <p class="card-text"><strong>{{subject.code}}</strong>: {{subject.name}}</p>
+            </div>
+          </div>
+          <div style="margin-left: auto;">
+            <div class="card-body">
+                <a class="btn btn-outline-info" href="{{ url_for('ratingSubjects', subjId=subject.id) }}" style="color:black" class="card-text">Avaliar</a>
+            </div>
+          </div>
+          </div>
+        </div>
+      {% else %}
+        <div class="card text-white bg-dark mb-3" style="max-width: 1200px;">
+          <div style="display: flex;">
+          <div>
+            <div class="card-body">
+              <p class="card-text"><strong>{{subject.code}}</strong>: {{subject.name}}</p>
+            </div>
+          </div>
+          <div style="margin-left: auto;">
+            <div class="card-body">
+                <a class="btn btn-outline-info" href="{{ url_for('ratingSubjects', subjId=subject.id) }}" style="color:white" class="card-text">Avaliar</a>
+            </div>
+          </div>
+          </div>
+        </div>
+      {% endif %}
+  {% endfor %}
+  </div>
+{% endblock restofhtml %}

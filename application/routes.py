@@ -3,12 +3,12 @@
 from flask import render_template, redirect, url_for, flash
 from flask import request
 from application import app, bcrypt, db
-from application.forms import RegistrationForm, LoginForm, TeacherSearchForm, SubjectSearchForm
+from application.forms import RegistrationForm, LoginForm, TeacherSearchForm, SubjectSearchForm, RateSubjectForm
 from flask_wtf import Form
 from wtforms.validators import DataRequired
 from wtforms import StringField
 from flask_login import login_user, current_user, logout_user, login_required
-from application.models import User, Teacher, Subject
+from application.models import User, Teacher, Subject, RatingElectiveSubject
 from contextlib import contextmanager
 
 @app.route("/")
@@ -33,7 +33,7 @@ def removeSubjects():
                     db.session.flush()
                     db.session.commit()
             else:
-                flash('É preciso selecionar disciplinas para removê-las.', 'danger')
+                flash('É preciso selecionar uma disciplina para removê-la.', 'danger')
             return redirect(url_for('editSubjects'))
     else:
         return redirect(url_for('login'))
@@ -68,22 +68,20 @@ def addSubjects():
                 subjectsAux = Subject.query.filter(Subject.name.contains(form.subject.data)).all()
             elif form.typeOfSearch.data == 'code':
                 subjectsAux = Subject.query.filter(Subject.code.contains(form.subject.data)).all()
-            elif form.typeOfSearch.data == 'class':
-                subjectsAux = Subject.query.filter(Subject.classITA.contains(form.subject.data)).all()
             # else:
                 # subjectsAux = Subject.query.filter(Subject.teachers.contains(form.subject.data)).all()
             if subjectsAux:
                 subjects = showAllSubjectsButTheOnesUserIsFollowing(subjectsAux)
                 if not subjects:
-                    flash('Você está cursando todas as disciplina encontradas com a palavra-chave buscada.', 'warning')
+                    flash('Você está cursando todas as disciplinas encontradas com a palavra-chave buscada.', 'warning')
             else:
-                flash('Disciplina não encontrada', 'danger')
+                flash('Disciplina não encontrada.', 'danger')
             return render_template('addsubjects.html', subjects=subjects, form=form)
         else:
             subjectsAux = Subject.query.all()
             subjects = showAllSubjectsButTheOnesUserIsFollowing(subjectsAux)
             if not subjects:
-                flash('Você está cursando todas as disciplina encontradas com a palavra-chave buscada.', 'warning')
+                flash('Você está cursando todas as disciplinas encontradas com a palavra-chave buscada.', 'warning')
             return render_template('addsubjects.html', subjects=subjects, form=form)
     else:
         return redirect(url_for('login'))
@@ -133,7 +131,7 @@ def login():
                 login_user(user, remember=form.remember.data)
                 return redirect(url_for('home'))
             else:
-                flash('Login não realizado. Por favor verifique seu email e senha', 'danger')
+                flash('Login não realizado. Por favor verifique seu email e senha.', 'danger')
     return render_template('login.html', title='Login', form=form)
 
 @app.route("/logout")
@@ -151,7 +149,7 @@ def teacher(routeIdentifier):
             if teachers:
                 return render_template('chooseteacher.html', teachers=teachers, form=form)
             else:
-                flash('Professor não encontrado', 'danger')
+                flash('Professor não encontrado.', 'danger')
                 return render_template('teacher.html', teacher=None, subjects=None, form=form)
         if routeIdentifier:
             teacher = Teacher.query.filter_by(routeIdentifier=routeIdentifier).first_or_404(description='There is no data with the route identifier {}'.format(routeIdentifier))
@@ -165,4 +163,69 @@ def teacher(routeIdentifier):
             return render_template('teacher.html', teacher=teacher, subjects=subjects, form=form)
 
         return render_template('teacher.html', teacher=None, subjects=None, form=form)
+    return redirect(url_for('login'))
+
+def showAllSubjectsButTheOnesUserHasRatedOrIsFollowing(subjectsAux):
+    subjects = []
+    for subject in subjectsAux:
+        if subject.classITA == 'Eletiva':
+            foundUser = False
+            for rating in subject.ratings:
+                if rating.raterId == current_user.id:
+                    foundUser = True
+                    break
+            if not foundUser:
+                for student in subject.students:
+                    if student.id == current_user.id:
+                        foundUser = True
+                        break
+                if not foundUser:
+                    subjects.append(subject)
+    return subjects
+
+@app.route("/ratesubjects", methods=['GET', 'POST'])
+def rateSubjects():
+    if current_user.is_authenticated:
+        form = SubjectSearchForm()
+        subjects = []
+        if form.validate_on_submit():
+            if form.typeOfSearch.data == 'name':
+                subjectsAux = Subject.query.filter(Subject.name.contains(form.subject.data)).all()
+            elif form.typeOfSearch.data == 'code':
+                subjectsAux = Subject.query.filter(Subject.code.contains(form.subject.data)).all()
+            # else:
+                # subjectsAux = Subject.query.filter(Subject.teachers.contains(form.subject.data)).all()
+            if subjectsAux:
+                subjects = showAllSubjectsButTheOnesUserHasRatedOrIsFollowing(subjectsAux)
+                if not subjects:
+                    flash('Você já avaliou ou está cursando todas as disciplinas encontradas com a palavra-chave buscada.', 'warning')
+            else:
+                flash('Disciplina não foi encontrada ou não é eletiva.', 'danger')
+        else:
+            subjectsAux = Subject.query.all()
+            subjects = showAllSubjectsButTheOnesUserHasRatedOrIsFollowing(subjectsAux)
+        return render_template('choosesubjecttorate.html', subjects=subjects, form=form)
+    else:
+        return redirect(url_for('login'))
+
+@app.route("/ratingsubjects", defaults={'subjId': None})
+@app.route("/ratingsubjects/<subjId>", methods=['GET', 'POST'])
+def ratingSubjects(subjId):
+    if current_user.is_authenticated:
+        if subjId:
+            subject = Subject.query.filter_by(id=subjId).first()
+            teachers = ""
+            for teacher in subject.teachers:
+                if teachers != "":
+                    teachers = teachers + ", "
+                teachers = teachers + "Prof. " + teacher.name
+        form = RateSubjectForm()
+        if form.validate_on_submit():
+            rating = RatingElectiveSubject(subject, current_user, form.anonymous.data, form.courseware.data, form.teacherRate.data, form.evaluationMethod.data, form.comment.data)
+            db.session.add(rating)
+            db.session.flush()
+            db.session.commit()
+            flash('Sua avaliação foi adicionada! Muito obrigado pela contribuição.', 'success')
+            return redirect(url_for('rateSubjects'))
+        return render_template('ratingsubjects.html', subject=subject, teachers=teachers, form=form)
     return redirect(url_for('login'))

@@ -16,6 +16,7 @@ class User(db.Model, UserMixin):
     classITA = db.Column(db.String(20), nullable=False)
     isRepr = db.Column(db.Boolean, nullable=False)
     subjects = db.relationship('Subject', secondary=subjectStudentAssociation, backref=db.backref('students', lazy = 'dynamic'))
+    ratings = db.relationship('RatingElectiveSubject', backref='rater')
     def __repr__(self):
         return f"User('{self.username}', '{self.email}')"
 
@@ -27,6 +28,7 @@ class Subject(db.Model):
     name = db.Column(db.String(120), nullable=False)
     teachers = db.relationship('Teacher', secondary=subjectTeacherAssociation, backref=db.backref('subjects', lazy = 'dynamic'))
     classITA = db.Column(db.String(20), nullable=False)
+    ratings = db.relationship('RatingElectiveSubject', backref='subject')
 
     def __init__(self, code, name, classITA):
         self.code = code
@@ -53,3 +55,25 @@ class Teacher(db.Model):
 
     def __repr__(self):
         return f"Teacher('{self.title}', '{self.name}', '{self.subjects}')"
+
+class RatingElectiveSubject(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    subjectId = db.Column(db.Integer, db.ForeignKey('subject.id'))
+    raterId = db.Column(db.Integer, db.ForeignKey('user.id'))
+    anonymous = db.Column(db.Boolean, nullable=False)
+    courseware = db.Column(db.Integer, nullable=False)
+    teacherRate = db.Column(db.Integer, nullable=False)
+    evaluationMethod = db.Column(db.Integer, nullable=False)
+    comment = db.Column(db.Text, nullable=False)
+
+    def __init__(self, subject, rater, anonymous, courseware, teacherRate, evaluationMethod, comment):
+        self.subject = subject
+        self.rater = rater
+        self.anonymous = anonymous
+        self.courseware = courseware
+        self.teacherRate = teacherRate
+        self.evaluationMethod = evaluationMethod
+        self.comment = comment
+
+    def __repr__(self):
+        return f"RateElectiveSubject('{self.title}', '{self.subject}', '{self.rater}', '{self.courseware}', '{self.teacherRate}', '{self.evaluationMethod}', '{self.comment}')"
