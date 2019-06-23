@@ -2,8 +2,8 @@
 
 from flask_wtf import FlaskForm
 from flask_login import current_user
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField
-from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField, DateField, TextAreaField
+from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError, Optional
 from application.models import User
 
 class RegistrationForm(FlaskForm):
@@ -59,3 +59,12 @@ class RateSubjectForm(FlaskForm):
     anonymous = BooleanField('Desejo que esta avaliação seja anônima')
     comment = StringField('Comentário', validators=[DataRequired()], render_kw={"placeholder": "Conte mais como foi sua experiência cursando a disciplina."})
     submit = SubmitField('Enviar')
+
+class ActivityForm(FlaskForm):
+    choices = [('1', '1'), ('2', '2'), ('3', '3'), ('4', '4'), ('5', '5')]
+    title = StringField('Título', validators=[DataRequired()])
+    content = TextAreaField('Comentários')
+    date_due = DateField('Data de Entrega', format='%d/%m/%Y', validators=[Optional()])
+    priority = SelectField('Prioridade', choices=choices ,validators=[DataRequired()])
+    forClass = BooleanField('Aplicar para toda a turma')
+    submit = SubmitField('Salvar atividade')

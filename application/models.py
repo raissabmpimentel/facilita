@@ -17,6 +17,7 @@ class User(db.Model, UserMixin):
     isRepr = db.Column(db.Boolean, nullable=False)
     subjects = db.relationship('Subject', secondary=subjectStudentAssociation, backref=db.backref('students', lazy = 'dynamic'))
     ratings = db.relationship('RatingElectiveSubject', backref='rater')
+    activities = db.relationship('Activity', backref='owner', lazy=True)
     def __repr__(self):
         return f"User('{self.username}', '{self.email}')"
 
@@ -77,3 +78,15 @@ class RatingElectiveSubject(db.Model):
 
     def __repr__(self):
         return f"RateElectiveSubject('{self.title}', '{self.subject}', '{self.rater}', '{self.courseware}', '{self.teacherRate}', '{self.evaluationMethod}', '{self.comment}')"
+
+class Activity(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    date_due = db.Column(db.Date, nullable=True)
+    forClass = db.Column(db.Boolean, nullable=False, default=False)
+    priority = db.Column(db.Integer, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+    def __repr__(self):
+        return f"Activity('{self.title}' written by {self.user_id} for {self.forClass})"

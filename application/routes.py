@@ -3,12 +3,12 @@
 from flask import render_template, redirect, url_for, flash
 from flask import request
 from application import app, bcrypt, db
-from application.forms import RegistrationForm, LoginForm, TeacherSearchForm, SubjectSearchForm, RateSubjectForm
+from application.forms import RegistrationForm, LoginForm, TeacherSearchForm, SubjectSearchForm, RateSubjectForm, ActivityForm
 from flask_wtf import Form
 from wtforms.validators import DataRequired
 from wtforms import StringField
 from flask_login import login_user, current_user, logout_user, login_required
-from application.models import User, Teacher, Subject, RatingElectiveSubject
+from application.models import User, Teacher, Subject, RatingElectiveSubject, Activity
 from contextlib import contextmanager
 
 @app.route("/")
@@ -229,3 +229,59 @@ def ratingSubjects(subjId):
             return redirect(url_for('rateSubjects'))
         return render_template('ratingsubjects.html', subject=subject, teachers=teachers, form=form)
     return redirect(url_for('login'))
+
+@app.route("/activities", methods=['GET', 'POST'])
+def activities():
+    activities = Activity.query.filter_by(owner=current_user).all()
+    return render_template('activities.html',activities=activities)
+
+@app.route("/activities/new", methods=['GET', 'POST'])
+def new_activity():
+    form = ActivityForm()
+    if form.validate_on_submit():
+        if form.forClass.data:
+            users = User.query.filter_by(classITA=current_user.classITA).all()
+            for user in users:
+                activity = Activity(title=form.title.data, content=form.content.data, date_due=form.date_due.data, priority=form.priority.data, forClass=form.forClass.data, owner=user)
+                db.session.add(activity)
+        else:
+            activity = Activity(title=form.title.data, content=form.content.data, date_due=form.date_due.data, priority=form.priority.data, forClass=form.forClass.data, owner=current_user)
+            db.session.add(activity)
+        db.session.commit()
+        return redirect(url_for('activities'))
+    return render_template('new_activity.html', form=form, title='Nova Atividade')
+
+@app.route("/activities/<int:act_id>/delete", methods=['POST', 'GET'])
+def delete_act(act_id):
+    activity = Activity.query.get(act_id)
+    if activity.forClass:
+        users = User.query.filter_by(classITA=current_user.classITA).all()
+        for user in users:
+            activity_d = Activity.query.filter_by(title=activity.title, content=activity.content, date_due=activity.date_due, priority=activity.priority, forClass=activity.forClass, owner=user).first()
+            db.session.delete(activity_d)
+    else:
+        db.session.delete(activity)
+    db.session.commit()
+    flash('Atividade apagada com sucesso!', 'success')
+    return redirect(url_for('activities'))
+
+@app.route("/activities/<int:act_id>/update", methods=['POST', 'GET'])
+def update_act(act_id):
+    activity = Activity.query.get(act_id)
+    form = ActivityForm()
+    if form.validate_on_submit():
+        activity.title = form.title.data
+        activity.content = form.content.data
+        activity.date_due = form.date_due.data
+        activity.priority = form.priority.data
+        activity.forClass = form.forClass.data
+        db.session.commit()
+        flash('Atividade alterada com sucesso!', 'success')
+        return redirect(url_for('activities'))
+    elif request.method == 'GET':
+        form.title.data = activity.title
+        form.content.data = activity.content
+        form.date_due.data = activity.date_due
+        form.priority.data = activity.priority
+        form.forClass.data = activity.forClass
+    return render_template('new_activity.html', form=form, title='Alterar Atividade')

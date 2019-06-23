@@ -1,11 +1,16 @@
 {% extends "navbarloginregister.html" %}
 
 {% block content %}
+<div style="display: flex;">
+<div>
+  <h2>Cadastre-se</h2>
+</div>
+</div>
+<hr width="100%">
 	<div class="content-section" style="margin-top: 10px;">
         <form method="POST" action="">
             {{ form.hidden_tag() }}
             <fieldset class="form-group">
-                <legend class="border-bottom mb-12">Cadastre-se</legend>
                 <div class="form-group">
                     {{ form.name.label(class="form-control-label") }}
 

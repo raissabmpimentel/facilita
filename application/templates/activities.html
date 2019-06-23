@@ -1,0 +1,37 @@
+{% extends "navbarmenu.html" %}
+
+{% block content %}
+<div style="display: flex;">
+<div>
+  <h2>Atividades</h2>
+</div>
+<div style="margin-left: auto;">
+<a class="btn btn-outline-dark" href="{{ url_for('new_activity') }}">
+  Adicionar Atividade
+</a>
+</div>
+</div>
+<hr width="100%">
+{% for activity in activities %}
+        <div class="card content-section m-2">
+          <div class="card-body">
+            <h2 class="article-title"">{{ activity.title }}</h2>
+
+            <p class="article-content">Comentários: {{ activity.content }}</p>
+            {%if activity.date_due %}
+              <p class="article-content">Data de Entrega: {{ activity.date_due.strftime('%d/%m/%Y')}}</p>
+            {% else %}
+                <p class="article-content">Data de Entrega: </p>
+            {% endif %}
+            <p class="article-content">Prioridade: {{activity.priority}}</p>
+            {% if (activity.forClass and current_user.isRepr) or (not activity.forClass)%}
+              <a href="{{ url_for('update_act', act_id=activity.id) }}" class="btn btn-outline-info">Alterar Atividade</a>
+              <a href="{{ url_for('delete_act', act_id=activity.id) }}" class="btn btn-outline-danger">Apagar Atividade</a>
+            {% endif %}
+          </div>
+
+
+        </div>
+{% endfor %}
+
+{% endblock content %}

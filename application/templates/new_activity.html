@@ -1,0 +1,82 @@
+{% extends "navbarmenu.html" %}
+
+{% block content %}
+<div style="display: flex;">
+<div>
+  <h2>{{ title }}</h2>
+</div>
+</div>
+<hr width="100%">
+<div class="content-section" style="margin-top: 10px;">
+  <form method="POST" action="">
+        {{ form.hidden_tag() }}
+        <fieldset class="form-group">
+            <div class="form-group">
+                {{ form.title.label(class="form-control-label") }}
+                {% if form.title.errors %}
+                    {{ form.title(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.title.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.title(class="form-control form-control-lg") }}
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.content.label(class="form-control-label") }}
+                {% if form.content.errors %}
+                    {{ form.content(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.content.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.content(class="form-control form-control-lg") }}
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.priority.label(class="form-control-label") }}
+                {% if form.priority.errors %}
+                    {{ form.priority(class="custom-select custom-select-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.priority.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.priority(class="custom-select custom-select-lg") }}
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.date_due.label(class="form-control-label") }}
+                {% if form.date_due.errors %}
+                    {{ form.date_due(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.date_due.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.date_due(class="form-control form-control-lg") }}
+                {% endif %}
+            </div>
+
+            {% if current_user.isRepr %}
+              <div class="form-check">
+                  {{ form.forClass(class="form-check-input") }}
+                  {{ form.forClass.label(class="form-check-label") }}
+              </div>
+              {% else %}
+              <div class="form-check">
+                  {{ form.forClass(class="form-check-input", disabled=True)}}
+                  {{ form.forClass.label(class="form-check-label", disabled=True) }}
+              </div>
+            {% endif %}
+          </fieldset>
+    <div class="form-group">{{ form.submit(class="btn btn-outline-info") }}</div>
+    </form>
+  </div>
+{% endblock content %}

@@ -1,11 +1,16 @@
 {% extends "navbarloginregister.html" %}
 
 {% block content %}
+<div style="display: flex;">
+<div>
+  <h2>Login</h2>
+</div>
+</div>
+<hr width="100%">
 	<div class="content-section">
         <form method="POST" action="">
             {{ form.hidden_tag() }}
             <fieldset class="form-group">
-                <legend class="border-bottom mb-4">Login</legend>
                 <div class="form-group">
                     {{ form.email.label(class="form-control-label") }}
                     {% if form.email.errors %}
@@ -39,9 +44,6 @@
             </fieldset>
             <div class="form-group">
                 {{ form.submit(class="btn btn-outline-info") }}
-                <small class="text-muted ml-2">
-                    <a href="#">Esqueceu a senha?</a>
-                </small>
             </div>
         </form>
     </div>
