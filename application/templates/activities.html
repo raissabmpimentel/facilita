@@ -18,7 +18,7 @@
             <h2 class="article-title"">{{ activity.title }}</h2>
 
             <p class="article-content">Comentários: {{ activity.content }}</p>
-            {%if activity.date_due %}
+            {%if activity.date_due%}
               <p class="article-content">Data de Entrega: {{ activity.date_due.strftime('%d/%m/%Y')}}</p>
             {% else %}
                 <p class="article-content">Data de Entrega: </p>

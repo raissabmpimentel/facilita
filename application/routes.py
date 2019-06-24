@@ -10,6 +10,7 @@ from wtforms import StringField
 from flask_login import login_user, current_user, logout_user, login_required
 from application.models import User, Teacher, Subject, RatingElectiveSubject, Activity
 from contextlib import contextmanager
+from datetime import date
 
 @app.route("/")
 @app.route("/home")
@@ -238,6 +239,7 @@ def activities():
 @app.route("/activities/new", methods=['GET', 'POST'])
 def new_activity():
     form = ActivityForm()
+    form.date_due.data = date.today()
     if form.validate_on_submit():
         if form.forClass.data:
             users = User.query.filter_by(classITA=current_user.classITA).all()
