@@ -18,7 +18,8 @@
             <h2 class="article-title"">{{ activity.title }}</h2>
 
             <p class="article-content">Comentários: {{ activity.content }}</p>
-            {%if activity.date_due%}
+            <p class="article-content">Progresso: {{ activity.progress }}</p>
+            {%if activity.date_due %}
               <p class="article-content">Data de Entrega: {{ activity.date_due.strftime('%d/%m/%Y')}}</p>
             {% else %}
                 <p class="article-content">Data de Entrega: </p>
@@ -28,6 +29,10 @@
               <a href="{{ url_for('update_act', act_id=activity.id) }}" class="btn btn-outline-info">Alterar Atividade</a>
               <a href="{{ url_for('delete_act', act_id=activity.id) }}" class="btn btn-outline-danger">Apagar Atividade</a>
             {% endif %}
+            {% if activity.forClass %}
+              <a href="{{ url_for('update_prog', act_id=activity.id) }}" class="btn btn-outline-secondary">Alterar Progresso</a>
+            {% endif %}
+            <a href="{{ url_for('done_act', act_id=activity.id) }}" class="btn btn-outline-success">Atividade Concluída</a>
           </div>
 
 

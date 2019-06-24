@@ -1,0 +1,42 @@
+{% extends "navbarmenu.html" %}
+
+{% block content %}
+<div style="display: flex;">
+<div>
+  <h2>{{ title }}</h2>
+</div>
+</div>
+<hr width="100%">
+<div class="content-section" style="margin-top: 10px;">
+  <form method="POST" action="">
+        {{ form.hidden_tag() }}
+        <fieldset class="form-group">
+            <div class="form-group">
+                {{ form.title.label(class="form-control-label") }}
+                {{ form.title(class="form-control form-control-lg", disabled=True) }}
+            </div>
+            <div class="form-group">
+                {{ form.content.label(class="form-control-label") }}
+                {{ form.content(class="form-control form-control-lg", disabled=True) }}
+            </div>
+            <div class="form-group">
+                {{ form.priority.label(class="form-control-label") }}
+                {{ form.priority(class="custom-select custom-select-lg", disabled=True) }}
+            </div>
+            <div class="form-group">
+                {{ form.progress.label(class="form-control-label") }}
+                {{ form.progress(class="custom-select custom-select-lg") }}
+            </div>
+            <div class="form-group">
+                {{ form.date_due.label(class="form-control-label") }}
+                {{ form.date_due(class="form-control form-control-lg", disabled=True) }}
+            </div>
+              <div class="form-check">
+                  {{ form.forClass(class="form-check-input", disabled=True)}}
+                  {{ form.forClass.label(class="form-check-label", disabled=True) }}
+              </div>
+          </fieldset>
+    <div class="form-group">{{ form.submit(class="btn btn-outline-info") }}</div>
+    </form>
+  </div>
+{% endblock content %}

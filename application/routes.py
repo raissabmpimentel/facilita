@@ -244,10 +244,10 @@ def new_activity():
         if form.forClass.data:
             users = User.query.filter_by(classITA=current_user.classITA).all()
             for user in users:
-                activity = Activity(title=form.title.data, content=form.content.data, date_due=form.date_due.data, priority=form.priority.data, forClass=form.forClass.data, owner=user)
+                activity = Activity(title=form.title.data, content=form.content.data, date_due=form.date_due.data, priority=form.priority.data, forClass=form.forClass.data, progress=form.progress.data, owner=user)
                 db.session.add(activity)
         else:
-            activity = Activity(title=form.title.data, content=form.content.data, date_due=form.date_due.data, priority=form.priority.data, forClass=form.forClass.data, owner=current_user)
+            activity = Activity(title=form.title.data, content=form.content.data, date_due=form.date_due.data, priority=form.priority.data, forClass=form.forClass.data, progress=form.progress.data, owner=current_user)
             db.session.add(activity)
         db.session.commit()
         return redirect(url_for('activities'))
@@ -260,7 +260,8 @@ def delete_act(act_id):
         users = User.query.filter_by(classITA=current_user.classITA).all()
         for user in users:
             activity_d = Activity.query.filter_by(title=activity.title, content=activity.content, date_due=activity.date_due, priority=activity.priority, forClass=activity.forClass, owner=user).first()
-            db.session.delete(activity_d)
+            if activity_d:
+                db.session.delete(activity_d)
     else:
         db.session.delete(activity)
     db.session.commit()
@@ -272,11 +273,22 @@ def update_act(act_id):
     activity = Activity.query.get(act_id)
     form = ActivityForm()
     if form.validate_on_submit():
-        activity.title = form.title.data
-        activity.content = form.content.data
-        activity.date_due = form.date_due.data
-        activity.priority = form.priority.data
-        activity.forClass = form.forClass.data
+        if form.forClass.data:
+            users = User.query.filter_by(classITA=current_user.classITA).all()
+            for user in users:
+                activity_u = Activity.query.filter_by(title=activity.title, content=activity.content, date_due=activity.date_due, priority=activity.priority, forClass=activity.forClass, owner=user).first()
+                if activity_u:
+                    activity_u.title = form.title.data
+                    activity_u.content = form.content.data
+                    activity_u.date_due = form.date_due.data
+                    activity_u.priority = form.priority.data
+        else:
+            activity.title = form.title.data
+            activity.content = form.content.data
+            activity.date_due = form.date_due.data
+            activity.priority = form.priority.data
+            activity.forClass = form.forClass.data
+            activity.progress = form.progress.data
         db.session.commit()
         flash('Atividade alterada com sucesso!', 'success')
         return redirect(url_for('activities'))
@@ -286,4 +298,31 @@ def update_act(act_id):
         form.date_due.data = activity.date_due
         form.priority.data = activity.priority
         form.forClass.data = activity.forClass
+        form.progress.data = activity.progress
     return render_template('new_activity.html', form=form, title='Alterar Atividade')
+
+@app.route("/activities/<int:act_id>/update_prog", methods=['POST', 'GET'])
+def update_prog(act_id):
+    activity = Activity.query.get(act_id)
+    form = ActivityForm()
+    if request.method == 'POST':
+        activity.progress = form.progress.data
+        db.session.commit()
+        flash('Progresso alterado com sucesso!', 'success')
+        return redirect(url_for('activities'))
+    elif request.method == 'GET':
+        form.title.data = activity.title
+        form.content.data = activity.content
+        form.date_due.data = activity.date_due
+        form.priority.data = activity.priority
+        form.forClass.data = activity.forClass
+        form.progress.data = activity.progress
+    return render_template('update_progress.html', form=form, title='Alterar Progresso')
+
+@app.route("/activities/<int:act_id>/done_act", methods=['POST', 'GET'])
+def done_act(act_id):
+    activity = Activity.query.get(act_id)
+    db.session.delete(activity)
+    db.session.commit()
+    flash('Atividade feita com sucesso!', 'success')
+    return redirect(url_for('activities'))
