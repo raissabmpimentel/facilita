@@ -1,0 +1,59 @@
+{% extends "navbarmenu.html" %}
+
+{% block content %}
+	<div class="content-section">
+      <legend class="border-bottom mb-4">Dados de avaliação da disciplina eletiva</legend>
+			<div class="card text-white bg-dark mb-3" style="max-width: 1200px;">
+				<div style="display: flex;">
+					<p style="font-size:17px; margin-right: 20px; margin-left: 20px; margin-top: 20px; margin-bottom: 20px;"><strong>Disciplina:</strong> {{subject.code}} - {{subject.name}}</p>
+				</div>
+			</div>
+
+			<div class="card text-black bg-light mb-3" style="max-width: 1200px;">
+				<div style="display: flex;">
+					<p style="font-size:17px; margin-right: 20px; margin-left: 20px; margin-top: 20px; margin-bottom: 20px;"><strong>Ministrada por:</strong> {{teachers}}</p>
+				</div>
+			</div>
+
+			<div class="card text-white bg-dark mb-3" style="max-width: 1200px;">
+			<div>
+        {% if subject.numberOfRatings == 1 %}
+				    <p style="font-size:17px; margin-top: 20px; margin-left: 20px;"><strong>Resultado da única avaliação realizada (nota 1 significa muito ruim, nota 5 significa excelente):</strong></p>
+        {% else %}
+            <p style="font-size:17px; margin-top: 20px; margin-left: 20px;"><strong>Média das {{subject.numberOfRatings}} avaliações realizadas (nota 1 significa muito ruim, nota 5 significa excelente):</strong></p>
+        {% endif %}
+			</div>
+
+			<ul>
+			<li>
+				<div style="display: flex;">
+		      <p style="font-size:17px; margin-right: 20px; margin-top: 5px;"><i>Material didático disponibilizado pelo professor:</i> {{subject.coursewareRate}}</p>
+		    </div>
+			</li>
+			<li>
+				<div style="display: flex;">
+		      <p style="font-size:17px; margin-right: 20px; margin-top: 5px;"><i>Didática do professor:</i> {{subject.teachersRate}}</p>
+		    </div>
+			</li>
+			<li>
+				<div style="display: flex;">
+		      <p style="font-size:17px; margin-right: 20px; margin-top: 5px;"><i>Método avaliativo da disciplina:</i> {{subject.evaluationMethodRate}}</p>
+		    </div>
+			</li>
+      <li>
+				<div style="display: flex;">
+		      <p style="font-size:17px; margin-right: 20px; margin-top: 5px;"><i>Nota final:</i> {{subject.finalRate}}</p>
+		    </div>
+			</li>
+			</ul>
+			</div>
+
+    <p style="font-size:17px; margin-left: 20px; margin-right: 20px; margin-top: 20px;"><strong>Comentários:</strong></p>
+    {% for comment in comments %}
+    <div class="card text-black bg-light mb-3" style="max-width: 1200px;">
+          <p class="card-text" style="font-size:17px; margin-top: 10px; margin-left: 20px;"><strong>{{comment[0]}}</strong></p>
+          <p class="card-text" style="font-size:17px; margin-left: 20px; margin-bottom: 10px;">{{comment[1]}}</p>
+    </div>
+  {% endfor %}
+    </div>
+{% endblock content %}

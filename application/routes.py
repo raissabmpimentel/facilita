@@ -209,6 +209,24 @@ def rateSubjects():
     else:
         return redirect(url_for('login'))
 
+def computeNewAverageValues(ratings,formCoursewareData, formTeacherRateData, formFinalRate, formEvaluationMethodData):
+    averages = []
+    averages.append(0)
+    averages.append(0)
+    averages.append(0)
+    averages.append(0)
+    for rating in ratings:
+        averages[0] += rating.courseware
+        averages[1] += rating.teacherRate
+        averages[2] += rating.finalRate
+        averages[3] += rating.evaluationMethod
+
+    averages[0] = (averages[0] + int(formCoursewareData))/(len(ratings) + 1)
+    averages[1] = (averages[1] + int(formTeacherRateData))/(len(ratings) + 1)
+    averages[2] = (averages[2] + int(formFinalRate))/(len(ratings) + 1)
+    averages[3] = (averages[3] + int(formEvaluationMethodData))/(len(ratings) + 1)
+    return averages
+
 @app.route("/ratingsubjects", defaults={'subjId': None})
 @app.route("/ratingsubjects/<subjId>", methods=['GET', 'POST'])
 def ratingSubjects(subjId):
@@ -222,14 +240,95 @@ def ratingSubjects(subjId):
                 teachers = teachers + "Prof. " + teacher.name
         form = RateSubjectForm()
         if form.validate_on_submit():
-            rating = RatingElectiveSubject(subject, current_user, form.anonymous.data, form.courseware.data, form.teacherRate.data, form.evaluationMethod.data, form.comment.data)
+            previousRatings = RatingElectiveSubject.query.filter_by(subjectId=subjId).all()
+            finalRate = int(form.courseware.data)*(0.2) + int(form.teacherRate.data)*(0.5) + int(form.evaluationMethod.data)*(0.3)
+            newAverages = computeNewAverageValues(previousRatings,form.courseware.data, form.teacherRate.data, finalRate , form.evaluationMethod.data)
+
+            subject.coursewareRate = newAverages[0]
+            subject.teachersRate = newAverages[1]
+            subject.finalRate = newAverages[2]
+            subject.evaluationMethodRate = newAverages[3]
+            subject.numberOfRatings = subject.numberOfRatings + 1
+
+            rating = RatingElectiveSubject(subject, current_user, form.anonymous.data, form.courseware.data, form.teacherRate.data, form.evaluationMethod.data, form.comment.data, finalRate)
             db.session.add(rating)
-            db.session.flush()
             db.session.commit()
             flash('Sua avaliação foi adicionada! Muito obrigado pela contribuição.', 'success')
             return redirect(url_for('rateSubjects'))
         return render_template('ratingsubjects.html', subject=subject, teachers=teachers, form=form)
     return redirect(url_for('login'))
+
+def showAllSubjectsRated(subjectsAux):
+    subjects = []
+    for subject in subjectsAux:
+        if subject.numberOfRatings > 0:
+            subjects.append(subject)
+    return subjects
+
+@app.route("/searchratedsubjects", defaults={'orderBy': None}, methods=['GET', 'POST'])
+@app.route("/searchratedsubjects/<orderBy>", methods=['GET', 'POST'])
+def searchRatedSubjects(orderBy):
+    if current_user.is_authenticated:
+        form = SubjectSearchForm()
+        subjects = []
+        if form.validate_on_submit():
+            if form.typeOfSearch.data == 'name':
+                subjectsAux = Subject.query.filter(Subject.name.contains(form.subject.data)).all()
+            elif form.typeOfSearch.data == 'code':
+                subjectsAux = Subject.query.filter(Subject.code.contains(form.subject.data)).all()
+            # else:
+                # subjectsAux = Subject.query.filter(Subject.teachers.contains(form.subject.data)).all()
+            if subjectsAux:
+                subjects = showAllSubjectsRated(subjectsAux)
+                if not subjects:
+                    flash('Você já avaliou ou está cursando todas as disciplinas encontradas com a palavra-chave buscada.', 'warning')
+            else:
+                flash('Disciplina não foi encontrada ou não é eletiva.', 'danger')
+        else:
+            if orderBy:
+                if orderBy == 'finalRate':
+                    subjectsAux = Subject.query.order_by(Subject.finalRate.desc()).all()
+                elif orderBy == 'teacherRate':
+                    subjectsAux = Subject.query.order_by(Subject.coursewareRate.desc()).all()
+                elif orderBy == 'coursewareRate':
+                    subjectsAux = Subject.query.order_by(Subject.teachersRate.desc()).all()
+                elif orderBy == 'evaluationMethodRate':
+                    subjectsAux = Subject.query.order_by(Subject.evaluationMethodRate.desc()).all()
+            else:
+                subjectsAux = Subject.query.all()
+            subjects = showAllSubjectsRated(subjectsAux)
+
+        return render_template('searchratedsubjects.html', subjects=subjects, form=form)
+    else:
+        return redirect(url_for('login'))
+
+@app.route("/gettingRatingInfo/<subjId>", methods=['GET', 'POST'])
+def gettingRatingInfo(subjId):
+    if current_user.is_authenticated:
+        if subjId:
+            subject = Subject.query.filter_by(id=subjId).first()
+            teachers = ""
+            for teacher in subject.teachers:
+                if teachers != "":
+                    teachers = teachers + ", "
+                teachers = teachers + "Prof. " + teacher.name
+            ratings = RatingElectiveSubject.query.filter_by(subjectId=subjId).all()
+            comments = []
+            for rating in ratings:
+                if rating.anonymous == True:
+                    name = "Comentário anônimo:"
+                    text = rating.comment
+                else:
+                    rater = User.query.filter_by(id=rating.raterId).first()
+                    name = rater.name + ":"
+                    text = rating.comment
+                comment = [name, text]
+                comments.append(comment)
+
+
+        return render_template('electivesubjectrate.html', subject=subject, teachers=teachers, comments=comments)
+    return redirect(url_for('login'))
+
 
 @app.route("/activities", methods=['GET', 'POST'])
 def activities():

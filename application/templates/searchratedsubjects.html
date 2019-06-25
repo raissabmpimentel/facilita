@@ -2,15 +2,33 @@
 
 {% block title %}
   <div>
-    <h2>Disciplinas disponíveis para avaliação</h2>
+    <h2>Disciplinas eletivas avaliadas</h2>
   </div>
   <hr width="100%">
 {% endblock title %}
 
 {% block restofhtml %}
+
+<div style="display: flex;">
 <div>
-  <p style="font-size:20px; margin-bottom: 20px;">Selecione uma disciplina para avaliar:</p>
+<p style="font-size:20px; margin-bottom: 20px;">Selecione uma disciplina para visualizar a avaliação:</p>
 </div>
+<div style="margin-left: auto;">
+  <div class="dropdown">
+  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    Filtrar por
+  </button>
+  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+    <a class="dropdown-item" href="{{ url_for('searchRatedSubjects', orderBy='finalRate') }}">Mais bem avaliadas</a>
+    <a class="dropdown-item" href="{{ url_for('searchRatedSubjects', orderBy='teacherRate') }}">Ministradas pelos professores com a melhor didática</a>
+    <a class="dropdown-item" href="{{ url_for('searchRatedSubjects', orderBy='coursewareRate') }}">Com o melhor material didático</a>
+    <a class="dropdown-item" href="{{ url_for('searchRatedSubjects', orderBy='evaluationMethodRate') }}">Com o melhor método de avaliação</a>
+  </div>
+  </div>
+</div>
+</div>
+<hr width="100%">
+
   <div>
     {% for subject in subjects %}
       {% if (loop.index)%2 == 0 %}
@@ -27,7 +45,7 @@
           </div>
           <div style="margin-left: auto;">
             <div class="card-body">
-                <a class="btn btn-outline-info" href="{{ url_for('ratingSubjects', subjId=subject.id) }}" style="color:black" class="card-text">Avaliar</a>
+                <a class="btn btn-outline-info" href="{{ url_for('gettingRatingInfo', subjId=subject.id) }}" style="color:black" class="card-text">Visualizar avaliação</a>
             </div>
           </div>
           </div>
@@ -46,7 +64,7 @@
           </div>
           <div style="margin-left: auto;">
             <div class="card-body">
-                <a class="btn btn-outline-info" href="{{ url_for('ratingSubjects', subjId=subject.id) }}" style="color:white" class="card-text">Avaliar</a>
+                <a class="btn btn-outline-info" href="{{ url_for('gettingRatingInfo', subjId=subject.id) }}" style="color:white" class="card-text">Visualizar avaliação</a>
             </div>
           </div>
           </div>

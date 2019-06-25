@@ -30,11 +30,21 @@ class Subject(db.Model):
     teachers = db.relationship('Teacher', secondary=subjectTeacherAssociation, backref=db.backref('subjects', lazy = 'dynamic'))
     classITA = db.Column(db.String(20), nullable=False)
     ratings = db.relationship('RatingElectiveSubject', backref='subject')
+    numberOfRatings = db.Column(db.Integer, nullable=False)
+    finalRate = db.Column(db.Float, nullable=False)
+    coursewareRate = db.Column(db.Float, nullable=False)
+    teachersRate = db.Column(db.Float, nullable=False)
+    evaluationMethodRate = db.Column(db.Float, nullable=False)
 
-    def __init__(self, code, name, classITA):
+    def __init__(self, code, name, classITA, numberOfRatings, coursewareRate, teachersRate, evaluationMethodRate, finalRate):
         self.code = code
         self.name = name
         self.classITA = classITA
+        self.numberOfRatings = numberOfRatings
+        self.coursewareRate = coursewareRate
+        self.teachersRate = teachersRate
+        self.evaluationMethodRate = evaluationMethodRate
+        self.finalRate = finalRate
 
     def __repr__(self):
         return f"Subject('{self.code}', '{self.name}')"
@@ -64,10 +74,11 @@ class RatingElectiveSubject(db.Model):
     anonymous = db.Column(db.Boolean, nullable=False)
     courseware = db.Column(db.Integer, nullable=False)
     teacherRate = db.Column(db.Integer, nullable=False)
+    finalRate = db.Column(db.Integer, nullable=False)
     evaluationMethod = db.Column(db.Integer, nullable=False)
     comment = db.Column(db.Text, nullable=False)
 
-    def __init__(self, subject, rater, anonymous, courseware, teacherRate, evaluationMethod, comment):
+    def __init__(self, subject, rater, anonymous, courseware, teacherRate, evaluationMethod, comment, finalRate):
         self.subject = subject
         self.rater = rater
         self.anonymous = anonymous
@@ -75,6 +86,7 @@ class RatingElectiveSubject(db.Model):
         self.teacherRate = teacherRate
         self.evaluationMethod = evaluationMethod
         self.comment = comment
+        self.finalRate = finalRate
 
     def __repr__(self):
         return f"RateElectiveSubject('{self.title}', '{self.subject}', '{self.rater}', '{self.courseware}', '{self.teacherRate}', '{self.evaluationMethod}', '{self.comment}')"

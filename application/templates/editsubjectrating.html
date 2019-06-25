@@ -2,7 +2,7 @@
 
 {% block title %}
   <div>
-    <h2>Disciplinas disponíveis para avaliação</h2>
+    <h2>Avaliações disponíveis para edição</h2>
   </div>
   <hr width="100%">
 {% endblock title %}
@@ -19,10 +19,6 @@
           <div>
             <div class="card-body">
               <p class="card-text"><strong>{{subject.code}}</strong>: {{subject.name}}</p>
-              {% for teacher in subject.teachers %}
-                  {% set displayName = "Prof. " + teacher.name %}
-                  <p><a href="{{ url_for('teacher', routeIdentifier=teacher.routeIdentifier) }}" style="color:black; font-size:15px" class="card-text">{{displayName}}</a></p>
-              {% endfor %}
             </div>
           </div>
           <div style="margin-left: auto;">
@@ -38,10 +34,6 @@
           <div>
             <div class="card-body">
               <p class="card-text"><strong>{{subject.code}}</strong>: {{subject.name}}</p>
-              {% for teacher in subject.teachers %}
-                  {% set displayName = "Prof. " + teacher.name %}
-                  <p><a href="{{ url_for('teacher', routeIdentifier=teacher.routeIdentifier) }}" style="color:white; font-size:15px" class="card-text">{{displayName}}</a></p>
-              {% endfor %}
             </div>
           </div>
           <div style="margin-left: auto;">
