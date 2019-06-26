@@ -9,6 +9,12 @@
       <li class="nav-item">
         <a class="nav-item nav-link" href="{{ url_for('teacher') }}">Professores</a>
       </li>
+      <li class="nav-item">
+        <a class="nav-item nav-link" href="{{ url_for('activities') }}">Atividades</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-item nav-link" href="{{ url_for('absences') }}">Faltas</a>
+      </li>
       <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           Eletivas
@@ -16,14 +22,8 @@
         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
           <a class="dropdown-item" href="{{ url_for('searchRatedSubjects') }}">Buscar disciplinas eletivas</a>
           <a class="dropdown-item" href="{{ url_for('rateSubjects') }}">Avaliar disciplinas eletivas</a>
-          <a class="dropdown-item" href="#">Editar avaliações realizadas</a>
+          <a class="dropdown-item" href="{{ url_for('editRatedSubjects') }}">Editar avaliações realizadas</a>
         </div>
-      </li>
-      <li class="nav-item">
-        <a class="nav-item nav-link" href="{{ url_for('activities') }}">Atividades</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-item nav-link" href="{{ url_for('absences') }}">Faltas</a>
       </li>
     </ul>
       <a class="nav-item nav-link" style="color:white;" href="{{ url_for('logout') }}">Logout</a>

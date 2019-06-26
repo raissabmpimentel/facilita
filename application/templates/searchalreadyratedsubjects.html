@@ -2,15 +2,15 @@
 
 {% block title %}
   <div>
-    <h2>Avaliações disponíveis para edição</h2>
+    <h2>Disciplinas eletivas avaliadas</h2>
   </div>
   <hr width="100%">
 {% endblock title %}
 
 {% block restofhtml %}
-<div>
-  <p style="font-size:20px; margin-bottom: 20px;">Selecione uma disciplina para avaliar:</p>
-</div>
+<p style="font-size:20px; margin-bottom: 20px;">Selecione uma disciplina para visualizar a avaliação:</p>
+<hr width="100%">
+
   <div>
     {% for subject in subjects %}
       {% if (loop.index)%2 == 0 %}
@@ -19,11 +19,15 @@
           <div>
             <div class="card-body">
               <p class="card-text"><strong>{{subject.code}}</strong>: {{subject.name}}</p>
+              {% for teacher in subject.teachers %}
+                  {% set displayName = "Prof. " + teacher.name %}
+                  <p><a href="{{ url_for('teacher', routeIdentifier=teacher.routeIdentifier) }}" style="color:black; font-size:15px" class="card-text">{{displayName}}</a></p>
+              {% endfor %}
             </div>
           </div>
           <div style="margin-left: auto;">
             <div class="card-body">
-                <a class="btn btn-outline-info" href="{{ url_for('ratingSubjects', subjId=subject.id) }}" style="color:black" class="card-text">Avaliar</a>
+                <a class="btn btn-outline-info" href="{{ url_for('editingRatedSubjects', subjId=subject.id) }}" style="color:black" class="card-text">Editar avaliação</a>
             </div>
           </div>
           </div>
@@ -34,11 +38,15 @@
           <div>
             <div class="card-body">
               <p class="card-text"><strong>{{subject.code}}</strong>: {{subject.name}}</p>
+              {% for teacher in subject.teachers %}
+                  {% set displayName = "Prof. " + teacher.name %}
+                  <p><a href="{{ url_for('teacher', routeIdentifier=teacher.routeIdentifier) }}" style="color:white; font-size:15px" class="card-text">{{displayName}}</a></p>
+              {% endfor %}
             </div>
           </div>
           <div style="margin-left: auto;">
             <div class="card-body">
-                <a class="btn btn-outline-info" href="{{ url_for('ratingSubjects', subjId=subject.id) }}" style="color:white" class="card-text">Avaliar</a>
+                <a class="btn btn-outline-info" href="{{ url_for('editingRatedSubjects', subjId=subject.id) }}" style="color:white" class="card-text">Editar avaliação</a>
             </div>
           </div>
           </div>
