@@ -32,8 +32,12 @@
                 {{ form.date_due(class="form-control form-control-lg", disabled=True) }}
             </div>
               <div class="form-check">
-                  {{ form.forClass(class="form-check-input", disabled=True)}}
-                  {{ form.forClass.label(class="form-check-label", disabled=True) }}
+                  {{ form.forClass_quest(class="form-check-input", disabled=True)}}
+                  {{ form.forClass_quest.label(class="form-check-label", disabled=True) }}
+              </div>
+              <div class="form-check">
+                  {{ form.forClass_n_quest(class="form-check-input", disabled=True)}}
+                  {{ form.forClass_n_quest.label(class="form-check-label", disabled=True) }}
               </div>
           </fieldset>
     <div class="form-group">{{ form.submit(class="btn btn-outline-info") }}</div>

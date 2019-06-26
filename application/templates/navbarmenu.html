@@ -10,10 +10,16 @@
         <a class="nav-item nav-link" href="{{ url_for('teacher') }}">Professores</a>
       </li>
       <li class="nav-item">
-        <a class="nav-item nav-link" href="{{ url_for('activities') }}">Atividades</a>
-      </li>
-      <li class="nav-item">
         <a class="nav-item nav-link" href="{{ url_for('absences') }}">Faltas</a>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Atividades
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <a class="dropdown-item" href="{{ url_for('activities') }}">Ativas</a>
+          <a class="dropdown-item" href="{{ url_for('activities_p') }}">A confirmar</a>
+        </div>
       </li>
       <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

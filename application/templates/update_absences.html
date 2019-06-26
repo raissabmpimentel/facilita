@@ -18,7 +18,7 @@
       </div>
       <div class="col-md-5">
         <div class="card-body">
-              <p>Faltas: {{absence.abs}} / {{subject.lim_abs}}</p>
+              <p>Faltas: {{absence.abs}} / {{subject.lim_abs}} ({{round(100*(absence.abs/subject.lim_abs),1)}}%)</p>
               <p>Justificativas: {{absence.just}}</p>
         </div>
       </div>

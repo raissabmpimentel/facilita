@@ -68,5 +68,10 @@ class ActivityForm(FlaskForm):
     date_due = DateField('Data de Entrega', format='%d/%m/%Y', validators=[Optional()])
     priority = SelectField('Prioridade', choices=choices ,validators=[DataRequired()])
     progress = SelectField('Progresso', choices=choices_2 ,validators=[DataRequired()])
-    forClass = BooleanField('Aplicar para toda a turma')
+    forClass_quest = BooleanField('Aplicar para toda a turma com questionário')
+    forClass_n_quest = BooleanField('Aplicar para toda a turma sem questionário')
     submit = SubmitField('Salvar atividade')
+
+class AcceptForm(FlaskForm):
+    accept = BooleanField('Aceitar sugestão')
+    submit = SubmitField('Responder questionário')
