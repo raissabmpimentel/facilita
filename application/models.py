@@ -20,7 +20,7 @@ class User(db.Model, UserMixin):
     activities = db.relationship('Activity', backref='owner', lazy=True)
     absences = db.relationship('Absence', backref='student', lazy=True)
     def __repr__(self):
-        return f"User('{self.username}', '{self.email}')"
+        return f"User('{self.name}', '{self.email}')"
 
 subjectTeacherAssociation = db.Table('subject-teacher association', db.Column('subjectId', db.Integer, db.ForeignKey('subject.id')), db.Column('teacherId', db.Integer, db.ForeignKey('teacher.id')))
 

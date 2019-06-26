@@ -415,8 +415,8 @@ def update_act(act_id):
             if form.forClass_quest.data or form.forClass_n_quest.data:
                 users = User.query.filter_by(classITA=current_user.classITA).all()
                 for user in users:
-                    if user is not current_user:
-                        activity_u = Activity.query.filter_by(title=activity.title, content=activity.content, date_due=activity.date_due, priority=activity.priority, forClass_quest=activity.forClass_quest, forClass_n_quest=activity.forClass_n_quest, owner=user).first()
+                    if user.id is not current_user.id:
+                        activity_u = Activity.query.filter_by(title=activity.title, content=activity.content, date_due=activity.date_due, priority=activity.priority, forClass_quest=activity.forClass_quest, forClass_n_quest=activity.forClass_n_quest, user_id=user.id).first()
                         if activity_u:
                             activity_u.title = form.title.data
                             activity_u.content = form.content.data
