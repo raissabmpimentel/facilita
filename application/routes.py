@@ -241,7 +241,7 @@ def computeNewAverageValues(ratings,formCoursewareData, formTeacherRateData, for
 
     averages[0] = (averages[0] + int(formCoursewareData))/(len(ratings) + notEditing)
     averages[1] = (averages[1] + int(formTeacherRateData))/(len(ratings) + notEditing)
-    averages[2] = (averages[2] + int(formFinalRate))/(len(ratings) + notEditing)
+    averages[2] = (averages[2] + formFinalRate)/(len(ratings) + notEditing)
     averages[3] = (averages[3] + int(formEvaluationMethodData))/(len(ratings) + notEditing)
     return averages
 
@@ -629,9 +629,9 @@ def editingRatedSubjects(subjId):
         form = RateSubjectForm()
         if request.method == 'POST':
             previousRatings = RatingElectiveSubject.query.filter_by(subjectId=subjId).all()
-            finalRate = int(form.courseware.data)*(0.2) + int(form.teacherRate.data)*(0.5) + int(form.evaluationMethod.data)*(0.3)
-            newAverages = computeNewAverageValues(previousRatings,form.courseware.data, form.teacherRate.data, finalRate , form.evaluationMethod.data, 0)
+            finalRate = float(form.courseware.data)*(0.2) + float(form.teacherRate.data)*(0.5) + float(form.evaluationMethod.data)*(0.3)
 
+            newAverages = computeNewAverageValues(previousRatings,form.courseware.data, form.teacherRate.data, finalRate , form.evaluationMethod.data, 0)
             subject.coursewareRate = newAverages[0]
             subject.teachersRate = newAverages[1]
             subject.finalRate = newAverages[2]
@@ -668,7 +668,6 @@ def processCellData(monthToDisplay):
         info = []
         info.append(str(currDate.day))
         info.append(currDate.month)
-        print(info[1])
         activities = Activity.query.filter_by(user_id=current_user.id, date_due=currDate, status='Ativo').order_by(Activity.priority.desc()).all()
         for activity in activities:
             info.append(activity.title)
@@ -712,7 +711,6 @@ def calendar(month):
             monthName = 'Dezembro 2019'
 
         cells = processCellData(monthToDisplay)
-        print("Number to display: ", monthToDisplay)
 
         return render_template('calendar.html', cells=cells, len=len, monthName=monthName, monthNumber=monthToDisplay)
     else:
