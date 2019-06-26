@@ -8,9 +8,12 @@ from flask_wtf import Form
 from wtforms.validators import DataRequired
 from wtforms import StringField
 from flask_login import login_user, current_user, logout_user, login_required
-from application.models import User, Teacher, Subject, RatingElectiveSubject, Activity, Absence
+from application.models import User, Teacher, Subject, RatingElectiveSubject, Activity, Absence, CalendarMonths
 from contextlib import contextmanager
 from datetime import date
+from datetime import time
+from datetime import datetime
+from datetime import timedelta
 
 @app.route("/")
 @app.route("/home")
@@ -601,6 +604,64 @@ def editingRatedSubjects(subjId):
             form.teacherRate.data = rating.teacherRate
             form.evaluationMethod.data = rating.evaluationMethod
             form.comment.data = rating.comment
-        return render_template('ratingsubjects.html', subject=subject, teachers=teachers, form=form, title='Editar avaliação')
+        return render_template('ratingsubjects.html', subject=subject, teachers=teachers, form=form, editing=editing, title='Editar avaliação')
+    else:
+        return redirect(url_for('login'))
+
+
+def processCellData(monthToDisplay):
+    mon = CalendarMonths.query.filter_by(month=monthToDisplay).first()
+    cell = []
+    currDate = mon.dateToStart
+    numberOfCells = 6*7
+    for i in range(0, numberOfCells):
+        info = []
+        info.append(str(currDate.day))
+        info.append(str(currDate.month))
+        activities = Activity.query.filter_by(user_id=current_user.id, date_due=currDate).order_by(Activity.priority.desc()).all()
+        for activity in activities:
+            info.append(activity.title)
+        currDate += timedelta(days=1)
+        cell.append(info)
+    return cell
+
+@app.route("/calendar", defaults={'month': None}, methods=['GET', 'POST'])
+@app.route("/calendar/<int:month>", methods=['GET', 'POST'])
+def calendar(month):
+    if current_user.is_authenticated:
+        if month:
+            monthToDisplay = month
+        else:
+            today = date.today()
+            monthToDisplay = today.month
+
+        if monthToDisplay == 1:
+            monthName = 'Janeiro 2019'
+        elif monthToDisplay == 2:
+            monthName = 'Fevereiro 2019'
+        elif monthToDisplay == 3:
+            monthName = 'Março 2019'
+        elif monthToDisplay == 4:
+            monthName = 'Abril 2019'
+        elif monthToDisplay == 5:
+            monthName = 'Maio 2019'
+        elif monthToDisplay == 6:
+            monthName = 'Junho 2019'
+        elif monthToDisplay == 7:
+            monthName = 'Julho 2019'
+        elif monthToDisplay == 8:
+            monthName = 'Agosto 2019'
+        elif monthToDisplay == 9:
+            monthName = 'Setembro 2019'
+        elif monthToDisplay == 10:
+            monthName = 'Outubro 2019'
+        elif monthToDisplay == 11:
+            monthName = 'Novembro 2019'
+        else:
+            monthName = 'Dezembro 2019'
+
+        cells = processCellData(monthToDisplay)
+
+        return render_template('calendar.html', cells=cells, len=len, monthName=monthName)
     else:
         return redirect(url_for('login'))

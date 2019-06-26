@@ -1,0 +1,123 @@
+{% extends "navbarmenu.html" %}
+
+{% block content %}
+
+    <style type="text/css">
+  @media (min-width: 768px){
+  .seven-cols .col-md-1,
+  .seven-cols .col-sm-1,
+  .seven-cols .col-lg-1  {
+    width: 100%;
+    *width: 100%;
+  }
+}
+@media (min-width: 992px) {
+  .seven-cols .col-md-1,
+  .seven-cols .col-sm-1,
+  .seven-cols .col-lg-1 {
+    width: 14.285714285714285714285714285714%;
+    *width: 14.285714285714285714285714285714%;
+    max-width: 14.285714285714285714285714285714% !important;
+flex:none !important;
+  }
+}
+
+@media (min-width: 1200px) {
+  .seven-cols .col-md-1,
+  .seven-cols .col-sm-1,
+  .seven-cols .col-lg-1 {
+    width: 14.285714285714285714285714285714%;
+    *width: 14.285714285714285714285714285714%;
+    max-width: 14.285714285714285714285714285714% !important;
+flex:none !important;
+  }
+}
+</style>
+
+{% endblock content %}
+
+{% block calendar %}
+
+
+<div style="display: flex; margin-left:20px;">
+<div>
+<h2>{{monthName}}</h2>
+</div>
+<div style="margin-left: auto; margin-right:80px;">
+  <div class="dropdown">
+  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    Mês
+  </button>
+  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+    {% set months = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro']%}
+    {% for i in range(12)%}
+    <a class="dropdown-item" href="{{ url_for('calendar', month=i+1) }}">{{months[i]}}</a>
+    {% endfor %}
+  </div>
+  </div>
+</div>
+</div>
+<hr width="99%">
+    {% for i in range(0, 42, 7) %}
+    <div class="row seven-cols" style="margin-left:15px; margin-right:15px;">
+      <div class="col-md-1" style="border-style:solid; border-width:1px;">
+        <p style="text-align:center; font-size:20px;"><strong>{{cells[i][0]}}</strong></p>
+        <ul>
+          {% for j in range(2, len(cells[i])) %}
+            <li>{{cells[i][j]}}</li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div class="col-md-1" style="border-style:solid; border-width:1px;">
+        <p style="text-align:center; font-size:20px;"><strong>{{cells[i+1][0]}}</strong></p>
+        <ul>
+          {% for j in range(2, len(cells[i+1])) %}
+            <li>{{cells[i+1][j]}}</li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div class="col-md-1" style="border-style:solid; border-width:1px;">
+        <p style="text-align:center; font-size:20px;"><strong>{{cells[i+2][0]}}</strong></p>
+        <ul>
+          {% for j in range(2, len(cells[i+2])) %}
+            <li>{{cells[i+2][j]}}</li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div class="col-md-1" style="border-style:solid; border-width:1px; height:140px">
+        <p style="text-align:center; font-size:20px;"><strong>{{cells[i+3][0]}}</strong></p>
+        <ul>
+          {% for j in range(2, len(cells[i+3])) %}
+            <li>{{cells[i+3][j]}}</li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div class="col-md-1" style="border-style:solid; border-width:1px;">
+        <p style="text-align:center; font-size:20px;"><strong>{{cells[i+4][0]}}</strong></p>
+        <ul>
+          {% for j in range(2, len(cells[i+4])) %}
+            <li>{{cells[i+4][j]}}</li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div class="col-md-1" style="border-style:solid; border-width:1px;">
+        <p style="text-align:center; font-size:20px;"><strong>{{cells[i+5][0]}}</strong></p>
+        <ul>
+          {% for j in range(2, len(cells[i+5])) %}
+            <li>{{cells[i+5][j]}}</li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div class="col-md-1" style="border-style:solid; border-width:1px;">
+        <p style="text-align:center; font-size:20px;"><strong>{{cells[i+6][0]}}</strong></p>
+        <ul>
+          {% for j in range(2, len(cells[i+6])) %}
+            <li>{{cells[i+6][j]}}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+    {% endfor %}
+
+
+{% endblock calendar %}

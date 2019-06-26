@@ -1,6 +1,8 @@
 from application.models import Teacher
 from application.models import Subject
+from application.models import CalendarMonths
 from application import db
+import datetime
 
 yano = Teacher('Yano', 'Edgar Toshiro Yano', 'yano@ita.br', '90', '5891')
 alonso = Teacher('Alonso', 'Carlos Alberto Alonso Sanches', 'alonso.ita@gmail.com', '112', '5985')
@@ -65,5 +67,44 @@ cmc10.teachers.append(manga)
 hum32.teachers.append(brutus)
 ces65.teachers.append(cunha)
 csi02.teachers.append(inaldo)
+
+dateToStartJan = datetime.datetime(2019, 12, 30, 0, 0)
+dateToStartFeb = datetime.datetime(2019, 1, 27, 0, 0)
+dateToStartMar = datetime.datetime(2019, 2, 24, 0, 0)
+dateToStartApr = datetime.datetime(2019, 3, 31, 0, 0)
+dateToStartMay = datetime.datetime(2019, 4, 28, 0, 0)
+dateToStartJun = datetime.datetime(2019, 5, 26, 0, 0)
+dateToStartJul = datetime.datetime(2019, 6, 30, 0, 0)
+dateToStartAug = datetime.datetime(2019, 7, 28, 0, 0)
+dateToStartSep = datetime.datetime(2019, 8, 25, 0, 0)
+dateToStartOct = datetime.datetime(2019, 9, 29, 0, 0)
+dateToStartNov = datetime.datetime(2019, 10, 27, 0, 0)
+dateToStartDec = datetime.datetime(2019, 11, 24, 0, 0)
+
+jan = CalendarMonths(1, 2019, dateToStartJan)
+fev = CalendarMonths(2, 2019, dateToStartFeb)
+mar = CalendarMonths(3, 2019, dateToStartMar)
+apr = CalendarMonths(4, 2019, dateToStartApr)
+may = CalendarMonths(5, 2019, dateToStartMay)
+jun = CalendarMonths(6, 2019, dateToStartJun)
+jul = CalendarMonths(7, 2019, dateToStartJul)
+aug = CalendarMonths(8, 2019, dateToStartAug)
+sep = CalendarMonths(9, 2019, dateToStartSep)
+oct = CalendarMonths(10, 2019, dateToStartOct)
+nov = CalendarMonths(11, 2019, dateToStartNov)
+dec = CalendarMonths(12, 2019, dateToStartDec)
+
+db.session.add(jan)
+db.session.add(fev)
+db.session.add(mar)
+db.session.add(apr)
+db.session.add(may)
+db.session.add(jun)
+db.session.add(jul)
+db.session.add(aug)
+db.session.add(sep)
+db.session.add(oct)
+db.session.add(nov)
+db.session.add(dec)
 
 db.session.commit()

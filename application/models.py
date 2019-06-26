@@ -108,6 +108,20 @@ class Activity(db.Model):
     def __repr__(self):
         return f"Activity('{self.title}' written by {self.user_id})"
 
+class CalendarMonths(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    dateToStart = db.Column(db.Date, nullable=False)
+    month = db.Column(db.Integer, nullable=False)
+    year = db.Column(db.Integer, nullable=False)
+
+    def __init__(self, month, year, dateToStart):
+        self.month = month
+        self.year = year
+        self.dateToStart = dateToStart
+
+    def __repr__(self):
+        return f"CalendarMonths('{self.month}' of {self.year} start on {self.dateToStart})"
+
 class Absence(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
