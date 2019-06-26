@@ -82,7 +82,7 @@ class RatingElectiveSubject(db.Model):
     evaluationMethod = db.Column(db.Integer, nullable=False)
     comment = db.Column(db.Text, nullable=False)
 
-    def __init__(self, subject, rater, anonymous, courseware, teacherRate, evaluationMethod, comment, finalRate):
+    def __init__(self, subject, rater, anonymous, courseware, teacherRate, evaluationMethod, comment):
         self.subject = subject
         self.rater = rater
         self.anonymous = anonymous
@@ -90,7 +90,7 @@ class RatingElectiveSubject(db.Model):
         self.teacherRate = teacherRate
         self.evaluationMethod = evaluationMethod
         self.comment = comment
-        self.finalRate = finalRate
+        self.finalRate = 0
 
     def __repr__(self):
         return f"RateElectiveSubject('{self.title}', '{self.subject}', '{self.rater}', '{self.courseware}', '{self.teacherRate}', '{self.evaluationMethod}', '{self.comment}')"

@@ -218,31 +218,30 @@ def rateSubjects():
     else:
         return redirect(url_for('login'))
 
-def computeNewAverageValues(ratings,formCoursewareData, formTeacherRateData, formFinalRate, formEvaluationMethodData, notEditing):
+def computeNewAverageValues(subject,formCoursewareData, formTeacherRateData, formEvaluationMethodData, editing, deleting):
     averages = []
-    averages.append(0)
-    averages.append(0)
-    averages.append(0)
-    averages.append(0)
-
-    if notEditing:
-        for rating in ratings:
-            averages[0] += rating.courseware
-            averages[1] += rating.teacherRate
-            averages[2] += rating.finalRate
-            averages[3] += rating.evaluationMethod
+    averages.append(subject.coursewareRate*subject.numberOfRatings)
+    averages.append(subject.teachersRate*subject.numberOfRatings)
+    averages.append(subject.evaluationMethodRate*subject.numberOfRatings)
+    if not editing and not deleting:
+        averages[0] = (averages[0] + int(formCoursewareData))/(subject.numberOfRatings + 1)
+        averages[1] = (averages[1] + int(formTeacherRateData))/(subject.numberOfRatings + 1)
+        averages[2] = (averages[2] + int(formEvaluationMethodData))/(subject.numberOfRatings + 1)
     else:
-        for rating in ratings:
-            if rating.raterId != current_user.id:
-                averages[0] += rating.courseware
-                averages[1] += rating.teacherRate
-                averages[2] += rating.finalRate
-                averages[3] += rating.evaluationMethod
-
-    averages[0] = (averages[0] + int(formCoursewareData))/(len(ratings) + notEditing)
-    averages[1] = (averages[1] + int(formTeacherRateData))/(len(ratings) + notEditing)
-    averages[2] = (averages[2] + formFinalRate)/(len(ratings) + notEditing)
-    averages[3] = (averages[3] + int(formEvaluationMethodData))/(len(ratings) + notEditing)
+        oldRates = RatingElectiveSubject.query.filter_by(subjectId=subject.id, raterId=current_user.id).first()
+        if editing:
+            averages[0] = (averages[0] - oldRates.courseware + int(formCoursewareData))/(subject.numberOfRatings)
+            averages[1] = (averages[1] - oldRates.teacherRate + int(formTeacherRateData))/(subject.numberOfRatings)
+            averages[2] = (averages[2] - oldRates.evaluationMethod + int(formEvaluationMethodData))/(subject.numberOfRatings)
+        elif deleting:
+            if subject.numberOfRatings - 1 != 0:
+                averages[0] = (averages[0] - oldRates.courseware)/(subject.numberOfRatings - 1)
+                averages[1] = (averages[1] - oldRates.teacherRate)/(subject.numberOfRatings - 1)
+                averages[2] = (averages[2] - oldRates.evaluationMethod)/(subject.numberOfRatings - 1)
+            else:
+                averages[0] = 0
+                averages[1] = 0
+                averages[2] = 0
     return averages
 
 @app.route("/ratingsubjects", defaults={'subjId': None})
@@ -258,17 +257,15 @@ def ratingSubjects(subjId):
                 teachers = teachers + "Prof. " + teacher.name
         form = RateSubjectForm()
         if form.validate_on_submit():
-            previousRatings = RatingElectiveSubject.query.filter_by(subjectId=subjId).all()
-            finalRate = int(form.courseware.data)*(0.2) + int(form.teacherRate.data)*(0.5) + int(form.evaluationMethod.data)*(0.3)
-            newAverages = computeNewAverageValues(previousRatings,form.courseware.data, form.teacherRate.data, finalRate , form.evaluationMethod.data, 1)
+            newAverages = computeNewAverageValues(subject,form.courseware.data, form.teacherRate.data, form.evaluationMethod.data, False, False)
 
             subject.coursewareRate = newAverages[0]
             subject.teachersRate = newAverages[1]
-            subject.finalRate = newAverages[2]
-            subject.evaluationMethodRate = newAverages[3]
+            subject.evaluationMethodRate = newAverages[2]
+            subject.finalRate = newAverages[0]*(0.2) + newAverages[1]*(0.5) + newAverages[2]*(0.3)
             subject.numberOfRatings = subject.numberOfRatings + 1
 
-            rating = RatingElectiveSubject(subject, current_user, form.anonymous.data, form.courseware.data, form.teacherRate.data, form.evaluationMethod.data, form.comment.data, finalRate)
+            rating = RatingElectiveSubject(subject, current_user, form.anonymous.data, form.courseware.data, form.teacherRate.data, form.evaluationMethod.data, form.comment.data)
             db.session.add(rating)
             db.session.commit()
             flash('Sua avaliação foi adicionada! Muito obrigado pela contribuição.', 'success')
@@ -628,19 +625,15 @@ def editingRatedSubjects(subjId):
 
         form = RateSubjectForm()
         if request.method == 'POST':
-            previousRatings = RatingElectiveSubject.query.filter_by(subjectId=subjId).all()
-            finalRate = float(form.courseware.data)*(0.2) + float(form.teacherRate.data)*(0.5) + float(form.evaluationMethod.data)*(0.3)
-
-            newAverages = computeNewAverageValues(previousRatings,form.courseware.data, form.teacherRate.data, finalRate , form.evaluationMethod.data, 0)
+            newAverages = computeNewAverageValues(subject,form.courseware.data, form.teacherRate.data, form.evaluationMethod.data, True, False)
             subject.coursewareRate = newAverages[0]
             subject.teachersRate = newAverages[1]
-            subject.finalRate = newAverages[2]
-            subject.evaluationMethodRate = newAverages[3]
+            subject.evaluationMethodRate = newAverages[2]
+            subject.finalRate = newAverages[0]*(0.2) + newAverages[1]*(0.5) + newAverages[2]*(0.3)
 
             rating.courseware = form.courseware.data
             rating.anonymous = form.anonymous.data
             rating.teacherRate = form.teacherRate.data
-            rating.finalRate = finalRate
             rating.evaluationMethod = form.evaluationMethod.data
             rating.comment = form.comment.data
 
@@ -727,26 +720,18 @@ def deletingRatedSubjects(subjId):
                 ratingId = rat.id
                 break
 
+        newAverages = computeNewAverageValues(subject,0, 0, 0, False, True)
+
+        subject.coursewareRate = newAverages[0]
+        subject.teachersRate = newAverages[1]
+        subject.evaluationMethodRate = newAverages[2]
+        subject.finalRate = newAverages[0]*0.2 + newAverages[1]*0.5 +  newAverages[2]*0.3
+
         rating = RatingElectiveSubject.query.get(ratingId)
         db.session.delete(rating)
         subject.numberOfRatings -= 1
         db.session.commit()
 
-        previousRatings = RatingElectiveSubject.query.filter_by(subjectId=subjId).all()
-
-        if len(previousRatings) is not 0:
-            newAverages = computeNewAverageValues(previousRatings,0, 0, 0, 0, 0)
-
-            subject.coursewareRate = newAverages[0]
-            subject.teachersRate = newAverages[1]
-            subject.finalRate = newAverages[2]
-            subject.evaluationMethodRate = newAverages[3]
-        else:
-            subject.coursewareRate = 0
-            subject.teachersRate = 0
-            subject.finalRate = 0
-            subject.evaluationMethodRate = 0
-        db.session.commit()
         flash('Avaliação excluída com sucesso!', 'success')
         return redirect(url_for('editRatedSubjects'))
     else:
