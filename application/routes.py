@@ -167,7 +167,8 @@ def teacher(routeIdentifier):
                 subjects = subjects + subject.code
 
             return render_template('teacher.html', teacher=teacher, subjects=subjects, form=form)
-
+        else:
+            flash('Digite o nome do professor na ferramenta de busca para visualizar suas informações.', 'warning')
         return render_template('teacher.html', teacher=None, subjects=None, form=form)
     return redirect(url_for('login'))
 
@@ -546,6 +547,8 @@ def editRatedSubjects():
         else:
             subjectsAux = Subject.query.all()
             subjects = showAllSubjectsUserRated(subjectsAux)
+        if not subjects:
+            flash('Você não realizou avaliações para poder editá-las. Aproveite e faça sua primeira avaliação!', 'warning')
 
         return render_template('searchalreadyratedsubjects.html', subjects=subjects, form=form)
     else:
