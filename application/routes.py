@@ -101,7 +101,7 @@ def addingSubjects(subjectCode):
             db.session.add(abs)
             db.session.flush()
             db.session.commit()
-            flash(subjectCode + ' foi adicionada às suas \"Disciplina em curso\".', 'success')
+            flash(subjectCode + ' foi adicionada às suas \"Disciplinas em curso\".', 'success')
         else:
             flash('Um erro ocorreu, por favor tente novamente.', 'danger')
         return redirect(url_for('addSubjects'))
@@ -484,7 +484,7 @@ def activities_p():
     if current_user.is_authenticated:
         activities = Activity.query.filter_by(owner=current_user, status='Pendente').all()
         if not activities:
-            flash('Você não possui atividades pendentes no momento.', 'warning')
+            flash('Você não possui atividades a confirmar no momento.', 'warning')
         return render_template('activities_p.html',activities=activities)
     else:
         return redirect(url_for('login'))
@@ -663,8 +663,9 @@ def processCellData(monthToDisplay):
     for i in range(0, numberOfCells):
         info = []
         info.append(str(currDate.day))
-        info.append(str(currDate.month))
-        activities = Activity.query.filter_by(user_id=current_user.id, date_due=currDate).order_by(Activity.priority.desc()).all()
+        info.append(currDate.month)
+        print(info[1])
+        activities = Activity.query.filter_by(user_id=current_user.id, date_due=currDate, status='Ativo').order_by(Activity.priority.desc()).all()
         for activity in activities:
             info.append(activity.title)
         currDate += timedelta(days=1)
@@ -707,8 +708,9 @@ def calendar(month):
             monthName = 'Dezembro 2019'
 
         cells = processCellData(monthToDisplay)
+        print("Number to display: ", monthToDisplay)
 
-        return render_template('calendar.html', cells=cells, len=len, monthName=monthName)
+        return render_template('calendar.html', cells=cells, len=len, monthName=monthName, monthNumber=monthToDisplay)
     else:
         return redirect(url_for('login'))
 
