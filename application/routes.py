@@ -339,6 +339,8 @@ def gettingRatingInfo(subjId):
 def activities():
     if current_user.is_authenticated:
         activities = Activity.query.filter_by(owner=current_user).all()
+        if not activities:
+            flash('Você não possui atividades no momento.', 'warning')
         return render_template('activities.html',activities=activities)
     else:
         return redirect(url_for('login'))
@@ -478,11 +480,23 @@ def upd_abs(abs_id,route):
         elif route == 'AddJust':
             absence.just += 1
         elif route == 'RemAtr':
-            absence.abs -= 0.5
+            if absence.abs < 0.5:
+                flash('Não há atrasos para serem removidos.', 'warning')
+                return redirect(url_for('absences'))
+            else:
+                absence.abs -= 0.5
         elif route == 'RemFalt':
-            absence.abs -= 1
+            if absence.abs < 1:
+                flash('Não há faltas para serem removidas.', 'warning')
+                return redirect(url_for('absences'))
+            else:
+                absence.abs -= 1
         elif route == 'RemJust':
-            absence.just -= 1
+            if absence.just < 1:
+                flash('Não há justificativas para serem removidas.', 'warning')
+                return redirect(url_for('absences'))
+            else:
+                absence.just -= 1
         db.session.commit()
         flash('Alterações feitas com sucesso!', 'success')
         return redirect(url_for('absences'))
