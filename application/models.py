@@ -18,6 +18,7 @@ class User(db.Model, UserMixin):
     subjects = db.relationship('Subject', secondary=subjectStudentAssociation, backref=db.backref('students', lazy = 'dynamic'))
     ratings = db.relationship('RatingElectiveSubject', backref='rater')
     activities = db.relationship('Activity', backref='owner', lazy=True)
+    absences = db.relationship('Absence', backref='student', lazy=True)
     def __repr__(self):
         return f"User('{self.username}', '{self.email}')"
 
@@ -29,12 +30,15 @@ class Subject(db.Model):
     name = db.Column(db.String(120), nullable=False)
     teachers = db.relationship('Teacher', secondary=subjectTeacherAssociation, backref=db.backref('subjects', lazy = 'dynamic'))
     classITA = db.Column(db.String(20), nullable=False)
+    lim_abs = db.Column(db.Float, nullable=False)
     ratings = db.relationship('RatingElectiveSubject', backref='subject')
+    absences = db.relationship('Absence', backref='subject', lazy=True)
 
-    def __init__(self, code, name, classITA):
+    def __init__(self, code, name, classITA, lim_abs):
         self.code = code
         self.name = name
         self.classITA = classITA
+        self.lim_abs = lim_abs
 
     def __repr__(self):
         return f"Subject('{self.code}', '{self.name}')"
@@ -90,4 +94,14 @@ class Activity(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
     def __repr__(self):
-        return f"Activity('{self.title}' written by {self.user_id} for {self.forClass})"
+        return f"Activity('{self.title}' written by {self.user_id})"
+
+class Absence(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    subject_id = db.Column(db.Integer, db.ForeignKey('subject.id'), nullable=False)
+    abs = db.Column(db.Float, nullable=False, default=0.0)
+    just = db.Column(db.Integer, nullable=False, default=0)
+
+    def __repr__(self):
+        return f"Absences: Total {self.abs} abscences of subject {self.subject_id} of user {self.user_id}"

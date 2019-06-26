@@ -1,0 +1,37 @@
+{% extends "navbarmenu.html" %}
+
+{% block content %}
+  <div style="display: flex;">
+  <div>
+    <h2>Atualizar Faltas</h2>
+  </div>
+  </div>
+  <hr width="100%">
+  <div class="card text-black bg-light mb-3" style="max-width: 1200px;">
+    <div class="row no-gutters">
+      <div class="col-md-7">
+        <div class="row no-gutters">
+        <div class="card-body">
+          <p class="card-text"><strong>{{subject.code}}</strong>: {{subject.name}}</p>
+        </div>
+        </div>
+      </div>
+      <div class="col-md-5">
+        <div class="card-body">
+              <p>Faltas: {{absence.abs}} / {{subject.lim_abs}}</p>
+              <p>Justificativas: {{absence.just}}</p>
+        </div>
+      </div>
+      <div class="card-body">
+        <a href="{{ url_for('upd_abs', abs_id=absence.id, route='AddAtr') }}" class="btn btn-outline-warning">Adicionar Atraso</a>
+        <a href="{{ url_for('upd_abs', abs_id=absence.id, route='AddFalt') }}" class="btn btn-outline-danger">Adicionar Falta</a>
+        <a href="{{ url_for('upd_abs', abs_id=absence.id, route='AddJust') }}" class="btn btn-outline-success">Adicionar Justificativa</a>
+      </div>
+      <div style="margin-left: auto;" class="card-body">
+        <a href="{{ url_for('upd_abs', abs_id=absence.id, route='RemAtr') }}" class="btn btn-outline-secondary">Remover Atraso</a>
+        <a href="{{ url_for('upd_abs', abs_id=absence.id, route='RemFalt') }}" class="btn btn-outline-secondary">Remover Falta</a>
+        <a href="{{ url_for('upd_abs', abs_id=absence.id, route='RemJust') }}" class="btn btn-outline-secondary">Remover Justificativa</a>
+      </div>
+    </div>
+  </div>
+{% endblock content %}

@@ -1,0 +1,53 @@
+{% extends "navbarmenu.html" %}
+
+{% block content %}
+  <div style="display: flex;">
+  <div>
+    <h2>Faltas</h2>
+    <small>Clique sobre a disciplina para alterar suas faltas!</small>
+  </div>
+  </div>
+  <hr width="100%">
+
+    {% for subject in subjects %}
+      {% if (loop.index)%2 == 0 %}
+      {% set absence = Absence.query.filter_by(student=current_user, subject=subject).first() %}
+        <div class="card text-black bg-light mb-3" style="max-width: 1200px;">
+          <div class="row no-gutters">
+            <div class="col-md-7">
+              <div class="row no-gutters">
+              <div class="card-body">
+                <p class="card-text"><a href="{{ url_for('update_abs', abs_id=absence.id) }}" style="color:black" class="card-text"><strong>{{subject.code}}</strong>: {{subject.name}}</a></p>
+              </div>
+              </div>
+            </div>
+            <div class="col-md-5">
+              <div class="card-body">
+                    <p><a href="{{ url_for('update_abs', abs_id=absence.id) }}" style="color:black" class="card-text">Faltas: {{absence.abs}} / {{subject.lim_abs}}</a></p>
+                    <p><a href="{{ url_for('update_abs', abs_id=absence.id) }}" style="color:black" class="card-text">Justificativas: {{absence.just}}</a></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% else %}
+      {% set absence = Absence.query.filter_by(student=current_user, subject=subject).first() %}
+        <div class="card text-white bg-dark mb-3" style="max-width: 1200px;">
+          <div class="row no-gutters">
+            <div class="col-md-7">
+              <div class="row no-gutters">
+              <div class="card-body">
+                <p class="card-text"><a href="{{ url_for('update_abs', abs_id=absence.id) }}" style="color:white" class="card-text"><strong>{{subject.code}}</strong>: {{subject.name}}</a></p>
+              </div>
+              </div>
+            </div>
+            <div class="col-md-5">
+              <div class="card-body">
+                    <p><a href="{{ url_for('update_abs', abs_id=absence.id) }}" style="color:white" class="card-text">Faltas: {{absence.abs}} / {{subject.lim_abs}}</a></p>
+                    <p><a href="{{ url_for('update_abs', abs_id=absence.id) }}" style="color:white" class="card-text">Justificativas: {{absence.just}}</a></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+  {% endfor %}
+{% endblock content %}
