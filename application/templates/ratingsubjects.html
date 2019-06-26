@@ -5,7 +5,7 @@
         <form method="POST" action="">
             {{ form.hidden_tag() }}
             <fieldset class="form-group">
-                <legend class="border-bottom mb-4">Avaliação de disciplina eletiva</legend>
+                <legend class="border-bottom mb-4">{{ title }}</legend>
 								<div class="card text-white bg-dark mb-3" style="max-width: 1200px;">
 									<div style="display: flex;">
 										<p style="font-size:17px; margin-right: 20px; margin-left: 20px; margin-top: 20px; margin-bottom: 20px;"><strong>Disciplina:</strong> {{subject.code}} - {{subject.name}}</p>

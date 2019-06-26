@@ -214,22 +214,31 @@ def rateSubjects():
     else:
         return redirect(url_for('login'))
 
-def computeNewAverageValues(ratings,formCoursewareData, formTeacherRateData, formFinalRate, formEvaluationMethodData):
+def computeNewAverageValues(ratings,formCoursewareData, formTeacherRateData, formFinalRate, formEvaluationMethodData, notEditing):
     averages = []
     averages.append(0)
     averages.append(0)
     averages.append(0)
     averages.append(0)
-    for rating in ratings:
-        averages[0] += rating.courseware
-        averages[1] += rating.teacherRate
-        averages[2] += rating.finalRate
-        averages[3] += rating.evaluationMethod
 
-    averages[0] = (averages[0] + int(formCoursewareData))/(len(ratings) + 1)
-    averages[1] = (averages[1] + int(formTeacherRateData))/(len(ratings) + 1)
-    averages[2] = (averages[2] + int(formFinalRate))/(len(ratings) + 1)
-    averages[3] = (averages[3] + int(formEvaluationMethodData))/(len(ratings) + 1)
+    if notEditing:
+        for rating in ratings:
+            averages[0] += rating.courseware
+            averages[1] += rating.teacherRate
+            averages[2] += rating.finalRate
+            averages[3] += rating.evaluationMethod
+    else:
+        for rating in ratings:
+            if rating.raterId != current_user.id:
+                averages[0] += rating.courseware
+                averages[1] += rating.teacherRate
+                averages[2] += rating.finalRate
+                averages[3] += rating.evaluationMethod
+
+    averages[0] = (averages[0] + int(formCoursewareData))/(len(ratings) + notEditing)
+    averages[1] = (averages[1] + int(formTeacherRateData))/(len(ratings) + notEditing)
+    averages[2] = (averages[2] + int(formFinalRate))/(len(ratings) + notEditing)
+    averages[3] = (averages[3] + int(formEvaluationMethodData))/(len(ratings) + notEditing)
     return averages
 
 @app.route("/ratingsubjects", defaults={'subjId': None})
@@ -247,7 +256,7 @@ def ratingSubjects(subjId):
         if form.validate_on_submit():
             previousRatings = RatingElectiveSubject.query.filter_by(subjectId=subjId).all()
             finalRate = int(form.courseware.data)*(0.2) + int(form.teacherRate.data)*(0.5) + int(form.evaluationMethod.data)*(0.3)
-            newAverages = computeNewAverageValues(previousRatings,form.courseware.data, form.teacherRate.data, finalRate , form.evaluationMethod.data)
+            newAverages = computeNewAverageValues(previousRatings,form.courseware.data, form.teacherRate.data, finalRate , form.evaluationMethod.data, 1)
 
             subject.coursewareRate = newAverages[0]
             subject.teachersRate = newAverages[1]
@@ -260,7 +269,7 @@ def ratingSubjects(subjId):
             db.session.commit()
             flash('Sua avaliação foi adicionada! Muito obrigado pela contribuição.', 'success')
             return redirect(url_for('rateSubjects'))
-        return render_template('ratingsubjects.html', subject=subject, teachers=teachers, form=form)
+        return render_template('ratingsubjects.html', subject=subject, teachers=teachers, form=form, title='Nova avaliação de disciplina eletiva')
     return redirect(url_for('login'))
 
 def showAllSubjectsRated(subjectsAux):
@@ -485,6 +494,96 @@ def upd_abs(abs_id,route):
             absence.just -= 1
         db.session.commit()
         flash('Alterações feitas com sucesso!', 'success')
-        return redirect(url_for('absences'))
+        return redirect(url_for('update_abs', abs_id=abs_id))
+    else:
+        return redirect(url_for('login'))
+
+def showAllSubjectsUserRated(subjectsAux):
+    subjects = []
+    for subject in subjectsAux:
+        ratings = subject.ratings
+        foundUser = False
+        for rating in ratings:
+            if rating.raterId == current_user.id:
+                foundUser = True
+                break
+        if foundUser:
+            subjects.append(subject)
+    return subjects
+
+@app.route("/editratedsubjects", methods=['GET', 'POST'])
+def editRatedSubjects():
+    if current_user.is_authenticated:
+        form = SubjectSearchForm()
+        subjects = []
+        if form.validate_on_submit():
+            if form.typeOfSearch.data == 'name':
+                subjectsAux = Subject.query.filter(and_(Subject.name.contains(form.subject.data), Subject.numberOfRatings>0)).all()
+            elif form.typeOfSearch.data == 'code':
+                subjectsAux = Subject.query.filter(and_(Subject.code.contains(form.subject.data), Subject.numberOfRatings>0)).all()
+            # else:
+                # subjectsAux = Subject.query.filter(Subject.teachers.contains(form.subject.data)).all()
+            if subjectsAux:
+                subjects = showAllSubjectsUserRated(subjectsAux)
+                if not subjects:
+                    flash('Você já avaliou ou está cursando todas as disciplinas encontradas com a palavra-chave buscada.', 'warning')
+            else:
+                flash('Disciplina não foi encontrada ou não é eletiva.', 'danger')
+        else:
+            subjectsAux = Subject.query.all()
+            subjects = showAllSubjectsUserRated(subjectsAux)
+
+        return render_template('searchalreadyratedsubjects.html', subjects=subjects, form=form)
+    else:
+        return redirect(url_for('login'))
+
+@app.route("/editingratedsubjects/<int:subjId>", methods=['POST', 'GET'])
+def editingRatedSubjects(subjId):
+    if current_user.is_authenticated:
+        subject = Subject.query.filter_by(id=subjId).first()
+
+        ratings = subject.ratings
+        for rat in ratings:
+            if rat.raterId == current_user.id:
+                ratingId = rat.id
+                break
+
+        rating = RatingElectiveSubject.query.get(ratingId)
+
+        teachers = ""
+        for teacher in subject.teachers:
+            if teachers != "":
+                teachers = teachers + ", "
+            teachers = teachers + "Prof. " + teacher.name
+
+        form = RateSubjectForm()
+        if request.method == 'POST':
+            previousRatings = RatingElectiveSubject.query.filter_by(subjectId=subjId).all()
+            finalRate = int(form.courseware.data)*(0.2) + int(form.teacherRate.data)*(0.5) + int(form.evaluationMethod.data)*(0.3)
+            newAverages = computeNewAverageValues(previousRatings,form.courseware.data, form.teacherRate.data, finalRate , form.evaluationMethod.data, 0)
+
+            subject.coursewareRate = newAverages[0]
+            subject.teachersRate = newAverages[1]
+            subject.finalRate = newAverages[2]
+            subject.evaluationMethodRate = newAverages[3]
+
+            rating.courseware = form.courseware.data
+            rating.anonymous = form.anonymous.data
+            rating.teacherRate = form.teacherRate.data
+            rating.finalRate = finalRate
+            rating.evaluationMethod = form.evaluationMethod.data
+            rating.comment = form.comment.data
+
+            db.session.add(rating)
+            db.session.commit()
+            flash('Avaliação alterada com sucesso!', 'success')
+            return redirect(url_for('editRatedSubjects'))
+        elif request.method == 'GET':
+            form.courseware.data = rating.courseware
+            form.anonymous.data = rating.anonymous
+            form.teacherRate.data = rating.teacherRate
+            form.evaluationMethod.data = rating.evaluationMethod
+            form.comment.data = rating.comment
+        return render_template('ratingsubjects.html', subject=subject, teachers=teachers, form=form, title='Editar avaliação')
     else:
         return redirect(url_for('login'))
