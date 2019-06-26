@@ -44,7 +44,15 @@
           </div>
           <div style="margin-left: auto;">
             <div class="card-body">
+              {% if order == 'finalRate' %}
                 <p class="card-text">Média: {{round(subject.finalRate, 1)}}</p>
+              {% elif order == 'teacherRate' %}
+                <p class="card-text">Média: {{round(subject.teachersRate, 1)}}</p>
+              {% elif order == 'coursewareRate' %}
+              <p class="card-text">Média: {{round(subject.coursewareRate, 1)}}</p>
+              {% else %}
+              <p class="card-text">Média: {{round(subject.evaluationMethodRate, 1)}}</p>
+              {% endif %}
                 <a class="btn btn-outline-info" href="{{ url_for('gettingRatingInfo', subjId=subject.id) }}" style="color:black" class="card-text">Visualizar avaliação</a>
             </div>
           </div>
@@ -64,7 +72,15 @@
           </div>
           <div style="margin-left: auto;">
             <div class="card-body">
+              {% if order == 'finalRate' %}
                 <p class="card-text">Média: {{round(subject.finalRate, 1)}}</p>
+              {% elif order == 'teacherRate' %}
+                <p class="card-text">Média: {{round(subject.teachersRate, 1)}}</p>
+              {% elif order == 'coursewareRate' %}
+              <p class="card-text">Média: {{round(subject.coursewareRate, 1)}}</p>
+              {% else %}
+              <p class="card-text">Média: {{round(subject.evaluationMethodRate, 1)}}</p>
+              {% endif %}
                 <a class="btn btn-outline-info" href="{{ url_for('gettingRatingInfo', subjId=subject.id) }}" style="color:white" class="card-text">Visualizar avaliação</a>
             </div>
           </div>

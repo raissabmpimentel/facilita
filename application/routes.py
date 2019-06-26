@@ -289,6 +289,7 @@ def searchRatedSubjects(orderBy):
     if current_user.is_authenticated:
         form = SubjectSearchForm()
         subjects = []
+        order = 'finalRate'
         if form.validate_on_submit():
             if form.typeOfSearch.data == 'name':
                 subjectsAux = Subject.query.filter(Subject.name.contains(form.subject.data)).all()
@@ -307,16 +308,19 @@ def searchRatedSubjects(orderBy):
                 if orderBy == 'finalRate':
                     subjectsAux = Subject.query.order_by(Subject.finalRate.desc()).all()
                 elif orderBy == 'teacherRate':
-                    subjectsAux = Subject.query.order_by(Subject.coursewareRate.desc()).all()
-                elif orderBy == 'coursewareRate':
                     subjectsAux = Subject.query.order_by(Subject.teachersRate.desc()).all()
+                    order = 'teacherRate'
+                elif orderBy == 'coursewareRate':
+                    subjectsAux = Subject.query.order_by(Subject.coursewareRate.desc()).all()
+                    order = 'coursewareRate'
                 elif orderBy == 'evaluationMethodRate':
                     subjectsAux = Subject.query.order_by(Subject.evaluationMethodRate.desc()).all()
+                    order = 'evaluationMethodRate'
             else:
                 subjectsAux = Subject.query.all()
             subjects = showAllSubjectsRated(subjectsAux)
 
-        return render_template('searchratedsubjects.html', subjects=subjects, form=form, round=round)
+        return render_template('searchratedsubjects.html', subjects=subjects, form=form, round=round, order=order)
     else:
         return redirect(url_for('login'))
 
@@ -650,7 +654,7 @@ def editingRatedSubjects(subjId):
             form.teacherRate.data = rating.teacherRate
             form.evaluationMethod.data = rating.evaluationMethod
             form.comment.data = rating.comment
-        return render_template('ratingsubjects.html', subject=subject, teachers=teachers, form=form, editing=editing, title='Editar avaliação')
+        return render_template('ratingsubjects.html', subject=subject, teachers=teachers, form=form, title='Editar avaliação')
     else:
         return redirect(url_for('login'))
 
