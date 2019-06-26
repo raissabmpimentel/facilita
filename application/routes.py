@@ -316,7 +316,7 @@ def searchRatedSubjects(orderBy):
                 subjectsAux = Subject.query.all()
             subjects = showAllSubjectsRated(subjectsAux)
 
-        return render_template('searchratedsubjects.html', subjects=subjects, form=form)
+        return render_template('searchratedsubjects.html', subjects=subjects, form=form, round=round)
     else:
         return redirect(url_for('login'))
 
@@ -344,7 +344,7 @@ def gettingRatingInfo(subjId):
                 comments.append(comment)
 
 
-        return render_template('electivesubjectrate.html', subject=subject, teachers=teachers, comments=comments)
+        return render_template('electivesubjectrate.html', subject=subject, teachers=teachers, comments=comments, round=round)
     return redirect(url_for('login'))
 
 

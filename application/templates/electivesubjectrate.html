@@ -27,22 +27,22 @@
 			<ul>
 			<li>
 				<div style="display: flex;">
-		      <p style="font-size:17px; margin-right: 20px; margin-top: 5px;"><i>Material didático disponibilizado pelo professor:</i> {{subject.coursewareRate}}</p>
+		      <p style="font-size:17px; margin-right: 20px; margin-top: 5px;"><i>Material didático disponibilizado pelo professor:</i> {{round(subject.coursewareRate, 1)}}</p>
 		    </div>
 			</li>
 			<li>
 				<div style="display: flex;">
-		      <p style="font-size:17px; margin-right: 20px; margin-top: 5px;"><i>Didática do professor:</i> {{subject.teachersRate}}</p>
+		      <p style="font-size:17px; margin-right: 20px; margin-top: 5px;"><i>Didática do professor:</i> {{round(subject.teachersRate, 1)}}</p>
 		    </div>
 			</li>
 			<li>
 				<div style="display: flex;">
-		      <p style="font-size:17px; margin-right: 20px; margin-top: 5px;"><i>Método avaliativo da disciplina:</i> {{subject.evaluationMethodRate}}</p>
+		      <p style="font-size:17px; margin-right: 20px; margin-top: 5px;"><i>Método avaliativo da disciplina:</i> {{round(subject.evaluationMethodRate, 1)}}</p>
 		    </div>
 			</li>
       <li>
 				<div style="display: flex;">
-		      <p style="font-size:17px; margin-right: 20px; margin-top: 5px;"><i>Nota final:</i> {{subject.finalRate}}</p>
+		      <p style="font-size:17px; margin-right: 20px; margin-top: 5px;"><i>Nota final:</i> {{round(subject.finalRate, 1)}}</p>
 		    </div>
 			</li>
 			</ul>
