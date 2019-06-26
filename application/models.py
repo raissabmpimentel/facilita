@@ -33,11 +33,21 @@ class Subject(db.Model):
     lim_abs = db.Column(db.Float, nullable=False)
     ratings = db.relationship('RatingElectiveSubject', backref='subject')
     absences = db.relationship('Absence', backref='subject', lazy=True)
+    numberOfRatings = db.Column(db.Integer, nullable=False)
+    finalRate = db.Column(db.Float, nullable=False)
+    coursewareRate = db.Column(db.Float, nullable=False)
+    teachersRate = db.Column(db.Float, nullable=False)
+    evaluationMethodRate = db.Column(db.Float, nullable=False)
 
-    def __init__(self, code, name, classITA, lim_abs):
+    def __init__(self, code, name, classITA, numberOfRatings, coursewareRate, teachersRate, evaluationMethodRate, finalRate, lim_abs):
         self.code = code
         self.name = name
         self.classITA = classITA
+        self.numberOfRatings = numberOfRatings
+        self.coursewareRate = coursewareRate
+        self.teachersRate = teachersRate
+        self.evaluationMethodRate = evaluationMethodRate
+        self.finalRate = finalRate
         self.lim_abs = lim_abs
 
     def __repr__(self):
@@ -68,10 +78,11 @@ class RatingElectiveSubject(db.Model):
     anonymous = db.Column(db.Boolean, nullable=False)
     courseware = db.Column(db.Integer, nullable=False)
     teacherRate = db.Column(db.Integer, nullable=False)
+    finalRate = db.Column(db.Integer, nullable=False)
     evaluationMethod = db.Column(db.Integer, nullable=False)
     comment = db.Column(db.Text, nullable=False)
 
-    def __init__(self, subject, rater, anonymous, courseware, teacherRate, evaluationMethod, comment):
+    def __init__(self, subject, rater, anonymous, courseware, teacherRate, evaluationMethod, comment, finalRate):
         self.subject = subject
         self.rater = rater
         self.anonymous = anonymous
@@ -79,6 +90,7 @@ class RatingElectiveSubject(db.Model):
         self.teacherRate = teacherRate
         self.evaluationMethod = evaluationMethod
         self.comment = comment
+        self.finalRate = finalRate
 
     def __repr__(self):
         return f"RateElectiveSubject('{self.title}', '{self.subject}', '{self.rater}', '{self.courseware}', '{self.teacherRate}', '{self.evaluationMethod}', '{self.comment}')"
