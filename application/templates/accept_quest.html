@@ -1,0 +1,25 @@
+{% extends "navbarmenu.html" %}
+
+{% block content %}
+<div style="display: flex;">
+<div>
+  <h2>{{ title }}</h2>
+</div>
+</div>
+<hr width="100%">
+<div class="content-section" style="margin-top: 10px;">
+  <form method="POST" action="">
+        {{ form.hidden_tag() }}
+        <fieldset class="form-group">
+            <div class="form-group">
+                <p>Você deseja que a atividade {{ activity.title }} seja no dia {{ activity.date_due.strftime('%d/%m/%Y')}}?</p>
+            </div>
+              <div class="form-check">
+                  {{ form.accept(class="form-check-input")}}
+                  {{ form.accept.label(class="form-check-label") }}
+              </div>
+          </fieldset>
+    <div class="form-group">{{ form.submit(class="btn btn-outline-info") }}</div>
+    </form>
+  </div>
+{% endblock content %}

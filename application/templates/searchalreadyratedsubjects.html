@@ -28,6 +28,7 @@
           <div style="margin-left: auto;">
             <div class="card-body">
                 <a class="btn btn-outline-info" href="{{ url_for('editingRatedSubjects', subjId=subject.id) }}" style="color:black" class="card-text">Editar avaliação</a>
+                <a class="btn btn-outline-danger" href="{{ url_for('deletingRatedSubjects', subjId=subject.id) }}" style="color:black" class="card-text">Apagar avaliação</a>
             </div>
           </div>
           </div>
@@ -47,6 +48,7 @@
           <div style="margin-left: auto;">
             <div class="card-body">
                 <a class="btn btn-outline-info" href="{{ url_for('editingRatedSubjects', subjId=subject.id) }}" style="color:white" class="card-text">Editar avaliação</a>
+                <a class="btn btn-outline-danger" href="{{ url_for('deletingRatedSubjects', subjId=subject.id) }}" style="color:white" class="card-text">Apagar avaliação</a>
             </div>
           </div>
           </div>

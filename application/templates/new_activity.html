@@ -77,8 +77,12 @@
                 {% endif %}
             </div>
               <div class="form-check">
-                  {{ form.forClass(class="form-check-input", disabled=(not current_user.isRepr))}}
-                  {{ form.forClass.label(class="form-check-label", disabled=(not current_user.isRepr)) }}
+                  {{ form.forClass_quest(class="form-check-input", disabled=(not current_user.isRepr))}}
+                  {{ form.forClass_quest.label(class="form-check-label", disabled=(not current_user.isRepr)) }}
+              </div>
+              <div class="form-check">
+                  {{ form.forClass_n_quest(class="form-check-input", disabled=(not current_user.isRepr))}}
+                  {{ form.forClass_n_quest.label(class="form-check-label", disabled=(not current_user.isRepr)) }}
               </div>
           </fieldset>
     <div class="form-group">{{ form.submit(class="btn btn-outline-info") }}</div>

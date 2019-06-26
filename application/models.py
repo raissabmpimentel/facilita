@@ -100,10 +100,14 @@ class Activity(db.Model):
     title = db.Column(db.String(100), nullable=False)
     content = db.Column(db.Text, nullable=False)
     date_due = db.Column(db.Date, nullable=True)
-    forClass = db.Column(db.Boolean, nullable=False, default=False)
+    forClass_quest = db.Column(db.Boolean, nullable=False, default=False)
+    forClass_n_quest = db.Column(db.Boolean, nullable=False, default=False)
     priority = db.Column(db.Integer, nullable=False)
     progress = db.Column(db.String(30), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    status = db.Column(db.String(30), nullable=False)
+    votes_up = db.Column(db.Integer, nullable=False, default=0)
+    resp_quest = db.Column(db.Boolean, nullable=False, default=False)
 
     def __repr__(self):
         return f"Activity('{self.title}' written by {self.user_id})"

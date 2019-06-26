@@ -3,12 +3,7 @@
 {% block content %}
 <div style="display: flex;">
 <div>
-  <h2>Atividades Ativas</h2>
-</div>
-<div style="margin-left: auto;">
-<a class="btn btn-outline-dark" href="{{ url_for('new_activity') }}">
-  Adicionar Atividade
-</a>
+  <h2>Atividades a confirmar</h2>
 </div>
 </div>
 <hr width="100%">
@@ -26,17 +21,20 @@
                 <p class="article-content">Data de Entrega: </p>
             {% endif %}
             <p class="article-content">Prioridade: {{activity.priority}}</p>
-            {% if ((activity.forClass_quest or activity.forClass_n_quest) and current_user.isRepr) or not (activity.forClass_quest or activity.forClass_n_quest)%}
+            <div style="margin-left: auto;">
+            {% if current_user.isRepr %}
               <a href="{{ url_for('update_act', act_id=activity.id) }}" class="btn btn-outline-info">Alterar Atividade</a>
               <a href="{{ url_for('delete_act', act_id=activity.id) }}" class="btn btn-outline-danger">Apagar Atividade</a>
             {% endif %}
-            {% if activity.forClass_quest or activity.forClass_n_quest %}
-              <a href="{{ url_for('update_prog', act_id=activity.id) }}" class="btn btn-outline-secondary">Alterar Progresso</a>
+            {% if not activity.resp_quest %}
+              <a href="{{ url_for('accept_act', act_id=activity.id) }}" class="btn btn-outline-secondary">Responder Questionário</a>
+            {% else %}
+            <div class="alert alert-success mt-2" role="alert">
+                Questionário respondido.
+            </div>
             {% endif %}
-            <a href="{{ url_for('done_act', act_id=activity.id) }}" class="btn btn-outline-success">Atividade Concluída</a>
+            </div>
           </div>
-
-
         </div>
 {% endfor %}
 
