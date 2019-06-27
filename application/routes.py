@@ -414,23 +414,23 @@ def update_act(act_id):
             if form.forClass_quest.data or form.forClass_n_quest.data:
                 users = User.query.filter_by(classITA=current_user.classITA).all()
                 for user in users:
-                    activity_u = Activity.query.filter_by(title=activity.title, content=activity.content, date_due=activity.date_due, priority=activity.priority, forClass_quest=activity.forClass_quest, forClass_n_quest=activity.forClass_n_quest, owner=user).first()
-                    if activity_u:
-                        activity_u.title = form.title.data
-                        activity_u.content = form.content.data
-                        activity_u.date_due = form.date_due.data
-                        activity_u.priority = form.priority.data
-                        activity_u.forClass_quest = form.forClass_quest.data
-                        activity_u.forClass_n_quest = form.forClass_n_quest.data
-                        activity_u.status = ('Pendente' if form.forClass_quest.data else 'Ativo')
-            else:
-                activity.title = form.title.data
-                activity.content = form.content.data
-                activity.date_due = form.date_due.data
-                activity.priority = form.priority.data
-                activity.forClass_quest = form.forClass_quest.data
-                activity.forClass_n_quest = form.forClass_n_quest.data
-                activity.progress = form.progress.data
+                    if user is not current_user:
+                        activity_u = Activity.query.filter_by(title=activity.title, content=activity.content, date_due=activity.date_due, priority=activity.priority, forClass_quest=activity.forClass_quest, forClass_n_quest=activity.forClass_n_quest, owner=user).first()
+                        if activity_u:
+                            activity_u.title = form.title.data
+                            activity_u.content = form.content.data
+                            activity_u.date_due = form.date_due.data
+                            activity_u.priority = form.priority.data
+                            activity_u.forClass_quest = form.forClass_quest.data
+                            activity_u.forClass_n_quest = form.forClass_n_quest.data
+                            activity_u.status = ('Pendente' if form.forClass_quest.data else 'Ativo')
+            activity.title = form.title.data
+            activity.content = form.content.data
+            activity.date_due = form.date_due.data
+            activity.priority = form.priority.data
+            activity.forClass_quest = form.forClass_quest.data
+            activity.forClass_n_quest = form.forClass_n_quest.data
+            activity.progress = form.progress.data
             db.session.commit()
             flash('Atividade alterada com sucesso!', 'success')
             return redirect(url_for('activities'))
