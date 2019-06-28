@@ -15,98 +15,6 @@ from datetime import time
 from datetime import datetime
 from datetime import timedelta
 
-@app.route("/")
-@app.route("/home")
-@app.route("/subjects", methods=['GET'])
-def home():
-    if current_user.is_authenticated:
-        subjects = current_user.subjects
-        return render_template('subjects.html', subjects=subjects)
-    else:
-        return redirect(url_for('login'))
-
-@app.route("/removesubjects", methods = ["GET", "POST"] )
-def removeSubjects():
-    if current_user.is_authenticated:
-        if request.method == "POST":
-            subjectsToRemove = request.form.getlist("subjectToRemove")
-            if subjectsToRemove:
-                for sub in subjectsToRemove:
-                    subject = Subject.query.filter_by(id=sub).first()
-                    subject.students.remove(current_user)
-                    db.session.flush()
-                    db.session.commit()
-            else:
-                flash('É preciso selecionar uma disciplina para removê-la.', 'danger')
-            return redirect(url_for('editSubjects'))
-    else:
-        return redirect(url_for('login'))
-
-@app.route("/editsubjects", methods=['GET'])
-def editSubjects():
-    if current_user.is_authenticated:
-        subjects = current_user.subjects
-        return render_template('editsubjects.html', subjects=subjects)
-    else:
-        return redirect(url_for('login'))
-
-def showAllSubjectsButTheOnesUserIsFollowing(subjectsAux):
-    subjects = []
-    for subject in subjectsAux:
-        foundUser = False
-        for student in subject.students:
-            if student.id == current_user.id:
-                foundUser = True
-                break
-        if not foundUser:
-            subjects.append(subject)
-    return subjects
-
-@app.route("/addsubjects", methods=['GET', 'POST'])
-def addSubjects():
-    if current_user.is_authenticated:
-        form = SubjectSearchForm()
-        subjects = []
-        if form.validate_on_submit():
-            if form.typeOfSearch.data == 'name':
-                subjectsAux = Subject.query.filter(Subject.name.contains(form.subject.data)).all()
-            elif form.typeOfSearch.data == 'code':
-                subjectsAux = Subject.query.filter(Subject.code.contains(form.subject.data)).all()
-            # else:
-                # subjectsAux = Subject.query.filter(Subject.teachers.contains(form.subject.data)).all()
-            if subjectsAux:
-                subjects = showAllSubjectsButTheOnesUserIsFollowing(subjectsAux)
-                if not subjects:
-                    flash('Você está cursando todas as disciplinas encontradas com a palavra-chave buscada.', 'warning')
-            else:
-                flash('Disciplina não encontrada.', 'danger')
-            return render_template('addsubjects.html', subjects=subjects, form=form)
-        else:
-            subjectsAux = Subject.query.all()
-            subjects = showAllSubjectsButTheOnesUserIsFollowing(subjectsAux)
-            if not subjects:
-                flash('Você está cursando todas as disciplinas encontradas com a palavra-chave buscada.', 'warning')
-            return render_template('addsubjects.html', subjects=subjects, form=form)
-    else:
-        return redirect(url_for('login'))
-
-@app.route("/addingsubjects", defaults={'subjectCode': None})
-@app.route("/addingsubjects/<subjectCode>", methods=['GET', 'POST'])
-def addingSubjects(subjectCode):
-    if current_user.is_authenticated:
-        if subjectCode:
-            subject = Subject.query.filter_by(code=subjectCode).first()
-            subject.students.append(current_user)
-            abs = Absence(student=current_user,subject=subject,abs=0.0,just=0)
-            db.session.add(abs)
-            db.session.flush()
-            db.session.commit()
-            flash(subjectCode + ' foi adicionada às suas \"Disciplinas em curso\".', 'success')
-        else:
-            flash('Um erro ocorreu, por favor tente novamente.', 'danger')
-        return redirect(url_for('addSubjects'))
-    return redirect(url_for('login'))
-
 @app.route("/cadastro", methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
@@ -148,6 +56,95 @@ def logout():
     logout_user()
     return redirect(url_for('home'))
 
+@app.route("/")
+@app.route("/home")
+@app.route("/subjects", methods=['GET'])
+def home():
+    if current_user.is_authenticated:
+        subjects = current_user.subjects
+        return render_template('subjects.html', subjects=subjects)
+    return redirect(url_for('login'))
+
+@app.route("/removesubjects", methods = ["GET", "POST"] )
+def removeSubjects():
+    if current_user.is_authenticated:
+        if request.method == "POST":
+            subjectsToRemove = request.form.getlist("subjectToRemove")
+            if subjectsToRemove:
+                for sub in subjectsToRemove:
+                    subject = Subject.query.filter_by(id=sub).first()
+                    subject.students.remove(current_user)
+                    absencesInSubject = Absence.query.filter_by(user_id=current_user.id, subject_id=subject.id).first()
+                    db.session.delete(absencesInSubject)
+                    db.session.commit()
+            else:
+                flash('É preciso selecionar uma disciplina para removê-la.', 'danger')
+            return redirect(url_for('editSubjects'))
+    return redirect(url_for('login'))
+
+@app.route("/editsubjects", methods=['GET'])
+def editSubjects():
+    if current_user.is_authenticated:
+        subjects = current_user.subjects
+        return render_template('editsubjects.html', subjects=subjects)
+    return redirect(url_for('login'))
+
+def showAllSubjectsButTheOnesUserIsFollowing(subjectsAux):
+    subjects = []
+    for subject in subjectsAux:
+        foundUser = False
+        for student in subject.students:
+            if student.id == current_user.id:
+                foundUser = True
+                break
+        if not foundUser:
+            subjects.append(subject)
+    return subjects
+
+@app.route("/addsubjects", methods=['GET', 'POST'])
+def addSubjects():
+    if current_user.is_authenticated:
+        form = SubjectSearchForm()
+        subjects = []
+        if form.validate_on_submit():
+            if form.typeOfSearch.data == 'name':
+                subjectsAux = Subject.query.filter(Subject.name.contains(form.subject.data)).all()
+            elif form.typeOfSearch.data == 'code':
+                subjectsAux = Subject.query.filter(Subject.code.contains(form.subject.data)).all()
+            # else:
+                # subjectsAux = Subject.query.filter(Subject.teachers.contains(form.subject.data)).all()
+            if subjectsAux:
+                subjects = showAllSubjectsButTheOnesUserIsFollowing(subjectsAux)
+                if not subjects:
+                    flash('Você está cursando todas as disciplinas encontradas com a palavra-chave buscada.', 'warning')
+            else:
+                flash('Disciplina não encontrada.', 'danger')
+            return render_template('addsubjects.html', subjects=subjects, form=form)
+        else:
+            subjectsAux = Subject.query.all()
+            subjects = showAllSubjectsButTheOnesUserIsFollowing(subjectsAux)
+            if not subjects:
+                flash('Você está cursando todas as disciplinas encontradas com a palavra-chave buscada.', 'warning')
+            return render_template('addsubjects.html', subjects=subjects, form=form)
+    return redirect(url_for('login'))
+
+@app.route("/addingsubjects", defaults={'subjectCode': None})
+@app.route("/addingsubjects/<subjectCode>", methods=['GET', 'POST'])
+def addingSubjects(subjectCode):
+    if current_user.is_authenticated:
+        if subjectCode:
+            subject = Subject.query.filter_by(code=subjectCode).first()
+            subject.students.append(current_user)
+            abs = Absence(student=current_user,subject=subject,abs=0.0,just=0)
+            db.session.add(abs)
+            db.session.flush()
+            db.session.commit()
+            flash(subjectCode + ' foi adicionada às suas \"Disciplinas em curso\".', 'success')
+        else:
+            flash('Um erro ocorreu, por favor tente novamente.', 'danger')
+        return redirect(url_for('addSubjects'))
+    return redirect(url_for('login'))
+
 @app.route("/teacher", defaults={'routeIdentifier': None}, methods=['GET', 'POST'])
 @app.route("/teacher/<routeIdentifier>", methods=['GET', 'POST'])
 def teacher(routeIdentifier):
@@ -175,22 +172,282 @@ def teacher(routeIdentifier):
         return render_template('teacher.html', teacher=None, subjects=None, form=form)
     return redirect(url_for('login'))
 
+
+@app.route("/activities", methods=['GET', 'POST'])
+def activities():
+    if current_user.is_authenticated:
+        activities = Activity.query.filter_by(owner=current_user, status='Ativo').all()
+        if not activities:
+            flash('Você não possui atividades ativas no momento.', 'warning')
+        return render_template('activities.html',activities=activities)
+    return redirect(url_for('login'))
+
+@app.route("/activities/new", methods=['GET', 'POST'])
+def new_activity():
+    if current_user.is_authenticated:
+        form = ActivityForm()
+        if request.method == 'GET':
+            form.date_due.data = date.today()
+        if form.validate_on_submit():
+            if form.forClass_n_quest.data and form.forClass_quest.data:
+                flash('Você não pode marcar as duas opções', 'danger')
+                return redirect(url_for('activities'))
+            if form.forClass_n_quest.data or form.forClass_quest.data:
+                users = User.query.filter_by(classITA=current_user.classITA).all()
+                for user in users:
+                    status = ('Pendente' if form.forClass_quest.data else 'Ativo')
+                    activity = Activity(title=form.title.data, content=form.content.data, date_due=form.date_due.data, priority=form.priority.data, forClass_quest=form.forClass_quest.data, forClass_n_quest= form.forClass_n_quest.data, status=status, progress=form.progress.data, owner=user)
+                    db.session.add(activity)
+            else:
+                activity = Activity(title=form.title.data, content=form.content.data, date_due=form.date_due.data, priority=form.priority.data, forClass_quest=form.forClass_quest.data, forClass_n_quest= form.forClass_n_quest.data, status='Ativo', progress=form.progress.data, owner=current_user)
+                db.session.add(activity)
+            flash('Atividade criada com sucesso!', 'success')
+            db.session.commit()
+            return redirect(url_for('activities'))
+        return render_template('new_activity.html', form=form, title='Nova Atividade')
+    return redirect(url_for('login'))
+
+@app.route("/activities/<int:act_id>/delete", methods=['POST', 'GET'])
+def delete_act(act_id):
+    if current_user.is_authenticated:
+        activity = Activity.query.get(act_id)
+        if activity.forClass_quest or activity.forClass_n_quest:
+            users = User.query.filter_by(classITA=current_user.classITA).all()
+            for user in users:
+                activity_d = Activity.query.filter_by(title=activity.title, content=activity.content, date_due=activity.date_due, priority=activity.priority, forClass_quest=activity.forClass_quest, forClass_n_quest=activity.forClass_n_quest, owner=user).first()
+                if activity_d:
+                    db.session.delete(activity_d)
+        else:
+            db.session.delete(activity)
+        db.session.commit()
+        flash('Atividade apagada com sucesso!', 'success')
+        return redirect(url_for('activities'))
+    return redirect(url_for('login'))
+
+@app.route("/activities/<int:act_id>/update", methods=['POST', 'GET'])
+def update_act(act_id):
+    if current_user.is_authenticated:
+        activity = Activity.query.get(act_id)
+        form = ActivityForm()
+        if form.validate_on_submit():
+            if form.forClass_n_quest.data and form.forClass_quest.data:
+                flash('Você não pode marcar as duas opções', 'danger')
+                return redirect(url_for('activities'))
+            if form.forClass_quest.data or form.forClass_n_quest.data:
+                users = User.query.filter_by(classITA=current_user.classITA).all()
+                for user in users:
+                    if user.id is not current_user.id:
+                        activity_u = Activity.query.filter_by(title=activity.title, content=activity.content, date_due=activity.date_due, priority=activity.priority, forClass_quest=activity.forClass_quest, forClass_n_quest=activity.forClass_n_quest, user_id=user.id).first()
+                        if activity_u:
+                            activity_u.title = form.title.data
+                            activity_u.content = form.content.data
+                            activity_u.date_due = form.date_due.data
+                            activity_u.priority = form.priority.data
+                            activity_u.forClass_quest = form.forClass_quest.data
+                            activity_u.forClass_n_quest = form.forClass_n_quest.data
+                            activity_u.status = ('Pendente' if form.forClass_quest.data else 'Ativo')
+            activity.title = form.title.data
+            activity.content = form.content.data
+            activity.date_due = form.date_due.data
+            activity.priority = form.priority.data
+            activity.forClass_quest = form.forClass_quest.data
+            activity.forClass_n_quest = form.forClass_n_quest.data
+            activity.progress = form.progress.data
+            db.session.commit()
+            flash('Atividade alterada com sucesso!', 'success')
+            return redirect(url_for('activities'))
+        elif request.method == 'GET':
+            form.title.data = activity.title
+            form.content.data = activity.content
+            form.date_due.data = activity.date_due
+            form.priority.data = activity.priority
+            form.forClass_quest.data = activity.forClass_quest
+            form.forClass_n_quest.data = activity.forClass_n_quest
+            form.progress.data = activity.progress
+        return render_template('new_activity.html', form=form, title='Alterar Atividade')
+    return redirect(url_for('login'))
+
+@app.route("/activities/<int:act_id>/update_prog", methods=['POST', 'GET'])
+def update_prog(act_id):
+    if current_user.is_authenticated:
+        activity = Activity.query.get(act_id)
+        form = ActivityForm()
+        if request.method == 'POST':
+            activity.progress = form.progress.data
+            db.session.commit()
+            flash('Progresso alterado com sucesso!', 'success')
+            return redirect(url_for('activities'))
+        elif request.method == 'GET':
+            form.title.data = activity.title
+            form.content.data = activity.content
+            form.date_due.data = activity.date_due
+            form.priority.data = activity.priority
+            form.forClass_quest.data = activity.forClass_quest
+            form.forClass_n_quest.data = activity.forClass_n_quest
+            form.progress.data = activity.progress
+        return render_template('update_progress.html', form=form, title='Alterar Progresso')
+    return redirect(url_for('login'))
+
+@app.route("/activities/<int:act_id>/done_act", methods=['POST', 'GET'])
+def done_act(act_id):
+    if current_user.is_authenticated:
+        activity = Activity.query.get(act_id)
+        db.session.delete(activity)
+        db.session.commit()
+        flash('Atividade feita com sucesso!', 'success')
+        return redirect(url_for('activities'))
+    return redirect(url_for('login'))
+
+@app.route("/activities_p", methods=['GET', 'POST'])
+def activities_p():
+    if current_user.is_authenticated:
+        activities = Activity.query.filter_by(owner=current_user, status='Pendente').all()
+        if not activities:
+            flash('Você não possui atividades a confirmar no momento.', 'warning')
+        return render_template('activities_p.html',activities=activities)
+    return redirect(url_for('login'))
+
+
+@app.route("/activities_p/<int:act_id>/accept", methods=['POST', 'GET'])
+def accept_act(act_id):
+    if current_user.is_authenticated:
+        form = AcceptForm()
+        activity = Activity.query.get(act_id)
+        if form.validate_on_submit():
+            if form.accept.data:
+                users = User.query.filter_by(classITA=current_user.classITA).all()
+                for user in users:
+                    activity_u = Activity.query.filter_by(title=activity.title, content=activity.content, date_due=activity.date_due, priority=activity.priority, forClass_quest=activity.forClass_quest, forClass_n_quest=activity.forClass_n_quest, owner=user).first()
+                    activity_u.votes_up += 1
+                    if activity_u.votes_up >= 0.5*len(users):
+                        activity_u.status = 'Ativo'
+            activity.resp_quest = True
+            db.session.commit()
+            flash('Obrigada pela sua contribuição.', 'success')
+            return redirect(url_for('activities'))
+        return render_template('accept_quest.html', form=form, activity=activity, title='Questionário de aceitação')
+    return redirect(url_for('login'))
+
+def processCellData(monthToDisplay):
+    mon = CalendarMonths.query.filter_by(month=monthToDisplay).first()
+    cell = []
+    currDate = mon.dateToStart
+    numberOfCells = 6*7
+    for i in range(0, numberOfCells):
+        info = []
+        info.append(str(currDate.day))
+        info.append(currDate.month)
+        activities = Activity.query.filter_by(user_id=current_user.id, date_due=currDate, status='Ativo').order_by(Activity.priority.desc()).all()
+        for activity in activities:
+            info.append(activity.title)
+        currDate += timedelta(days=1)
+        cell.append(info)
+    return cell
+
+@app.route("/calendar", defaults={'month': None}, methods=['GET', 'POST'])
+@app.route("/calendar/<int:month>", methods=['GET', 'POST'])
+def calendar(month):
+    if current_user.is_authenticated:
+        if month:
+            monthToDisplay = month
+        else:
+            today = date.today()
+            monthToDisplay = today.month
+
+        if monthToDisplay == 1:
+            monthName = 'Janeiro 2019'
+        elif monthToDisplay == 2:
+            monthName = 'Fevereiro 2019'
+        elif monthToDisplay == 3:
+            monthName = 'Março 2019'
+        elif monthToDisplay == 4:
+            monthName = 'Abril 2019'
+        elif monthToDisplay == 5:
+            monthName = 'Maio 2019'
+        elif monthToDisplay == 6:
+            monthName = 'Junho 2019'
+        elif monthToDisplay == 7:
+            monthName = 'Julho 2019'
+        elif monthToDisplay == 8:
+            monthName = 'Agosto 2019'
+        elif monthToDisplay == 9:
+            monthName = 'Setembro 2019'
+        elif monthToDisplay == 10:
+            monthName = 'Outubro 2019'
+        elif monthToDisplay == 11:
+            monthName = 'Novembro 2019'
+        else:
+            monthName = 'Dezembro 2019'
+
+        cells = processCellData(monthToDisplay)
+
+        return render_template('calendar.html', cells=cells, len=len, monthName=monthName, monthNumber=monthToDisplay)
+    else:
+        return redirect(url_for('login'))
+
+@app.route("/absences", methods=['POST', 'GET'])
+def absences():
+    if current_user.is_authenticated:
+        subjects = current_user.subjects
+        return render_template('absences.html', subjects=subjects, Absence=Absence, round=round)
+    return redirect(url_for('login'))
+
+@app.route("/absences/<int:abs_id>/update", methods=['POST', 'GET'])
+def update_abs(abs_id):
+    if current_user.is_authenticated:
+        absence = Absence.query.get(abs_id)
+        subject = absence.subject
+        return render_template('update_absences.html', absence=absence, subject=subject, round=round)
+    return redirect(url_for('login'))
+
+@app.route("/absences/<int:abs_id>/update/<route>", methods=['POST', 'GET'])
+def upd_abs(abs_id,route):
+    if current_user.is_authenticated:
+        absence = Absence.query.get(abs_id)
+        if route == 'AddAtr':
+            absence.abs += 0.5
+        elif route == 'AddFalt':
+            absence.abs += 1
+        elif route == 'AddJust':
+            absence.just += 1
+        elif route == 'RemAtr':
+            if absence.abs < 0.5:
+                flash('Não há atrasos para serem removidos.', 'warning')
+                return redirect(url_for('absences'))
+            else:
+                absence.abs -= 0.5
+        elif route == 'RemFalt':
+            if absence.abs < 1:
+                flash('Não há faltas para serem removidas.', 'warning')
+                return redirect(url_for('absences'))
+            else:
+                absence.abs -= 1
+        elif route == 'RemJust':
+            if absence.just < 1:
+                flash('Não há justificativas para serem removidas.', 'warning')
+                return redirect(url_for('absences'))
+            else:
+                absence.just -= 1
+        db.session.commit()
+        flash('Alterações feitas com sucesso!', 'success')
+        return redirect(url_for('update_abs', abs_id=abs_id))
+    return redirect(url_for('login'))
+
 def showAllSubjectsButTheOnesUserHasRatedOrIsFollowing(subjectsAux):
     subjects = []
     for subject in subjectsAux:
-        if subject.classITA == 'Eletiva':
-            foundUser = False
-            for rating in subject.ratings:
-                if rating.raterId == current_user.id:
+        foundUser = False
+        for rating in subject.ratings:
+            if rating.raterId == current_user.id:
+                foundUser = True
+                break
+        if not foundUser:
+            for student in subject.students:
+                if student.id == current_user.id:
                     foundUser = True
                     break
             if not foundUser:
-                for student in subject.students:
-                    if student.id == current_user.id:
-                        foundUser = True
-                        break
-                if not foundUser:
-                    subjects.append(subject)
+                subjects.append(subject)
     return subjects
 
 @app.route("/ratesubjects", methods=['GET', 'POST'])
@@ -200,9 +457,9 @@ def rateSubjects():
         subjects = []
         if form.validate_on_submit():
             if form.typeOfSearch.data == 'name':
-                subjectsAux = Subject.query.filter(Subject.name.contains(form.subject.data)).all()
+                subjectsAux = Subject.query.filter(and_(Subject.name.contains(form.subject.data), Subject.classITA == 'Eletiva')).all()
             elif form.typeOfSearch.data == 'code':
-                subjectsAux = Subject.query.filter(Subject.code.contains(form.subject.data)).all()
+                subjectsAux = Subject.query.filter(and_(Subject.code.contains(form.subject.data), Subject.classITA == 'Eletiva')).all()
             # else:
                 # subjectsAux = Subject.query.filter(Subject.teachers.contains(form.subject.data)).all()
             if subjectsAux:
@@ -212,11 +469,10 @@ def rateSubjects():
             else:
                 flash('Disciplina não foi encontrada ou não é eletiva.', 'danger')
         else:
-            subjectsAux = Subject.query.all()
+            subjectsAux = Subject.query.filter(Subject.classITA == 'Eletiva').all()
             subjects = showAllSubjectsButTheOnesUserHasRatedOrIsFollowing(subjectsAux)
         return render_template('choosesubjecttorate.html', subjects=subjects, form=form)
-    else:
-        return redirect(url_for('login'))
+    return redirect(url_for('login'))
 
 def computeNewAverageValues(subject,formCoursewareData, formTeacherRateData, formEvaluationMethodData, editing, deleting):
     averages = []
@@ -318,8 +574,7 @@ def searchRatedSubjects(orderBy):
             subjects = showAllSubjectsRated(subjectsAux)
 
         return render_template('searchratedsubjects.html', subjects=subjects, form=form, round=round, order=order)
-    else:
-        return redirect(url_for('login'))
+    return redirect(url_for('login'))
 
 @app.route("/gettingRatingInfo/<subjId>", methods=['GET', 'POST'])
 def gettingRatingInfo(subjId):
@@ -347,221 +602,6 @@ def gettingRatingInfo(subjId):
 
         return render_template('electivesubjectrate.html', subject=subject, teachers=teachers, comments=comments, round=round)
     return redirect(url_for('login'))
-
-
-@app.route("/activities", methods=['GET', 'POST'])
-def activities():
-    if current_user.is_authenticated:
-        activities = Activity.query.filter_by(owner=current_user, status='Ativo').all()
-        if not activities:
-            flash('Você não possui atividades ativas no momento.', 'warning')
-        return render_template('activities.html',activities=activities)
-    else:
-        return redirect(url_for('login'))
-
-@app.route("/activities/new", methods=['GET', 'POST'])
-def new_activity():
-    if current_user.is_authenticated:
-        form = ActivityForm()
-        if request.method == 'GET':
-            form.date_due.data = date.today()
-        if form.validate_on_submit():
-            if form.forClass_n_quest.data and form.forClass_quest.data:
-                flash('Você não pode marcar as duas opções', 'danger')
-                return redirect(url_for('activities'))
-            if form.forClass_n_quest.data or form.forClass_quest.data:
-                users = User.query.filter_by(classITA=current_user.classITA).all()
-                for user in users:
-                    status = ('Pendente' if form.forClass_quest.data else 'Ativo')
-                    activity = Activity(title=form.title.data, content=form.content.data, date_due=form.date_due.data, priority=form.priority.data, forClass_quest=form.forClass_quest.data, forClass_n_quest= form.forClass_n_quest.data, status=status, progress=form.progress.data, owner=user)
-                    db.session.add(activity)
-            else:
-                activity = Activity(title=form.title.data, content=form.content.data, date_due=form.date_due.data, priority=form.priority.data, forClass_quest=form.forClass_quest.data, forClass_n_quest= form.forClass_n_quest.data, status='Ativo', progress=form.progress.data, owner=current_user)
-                db.session.add(activity)
-            flash('Atividade criada com sucesso!', 'success')
-            db.session.commit()
-            return redirect(url_for('activities'))
-        return render_template('new_activity.html', form=form, title='Nova Atividade')
-    else:
-        return redirect(url_for('login'))
-
-@app.route("/activities/<int:act_id>/delete", methods=['POST', 'GET'])
-def delete_act(act_id):
-    if current_user.is_authenticated:
-        activity = Activity.query.get(act_id)
-        if activity.forClass_quest or activity.forClass_n_quest:
-            users = User.query.filter_by(classITA=current_user.classITA).all()
-            for user in users:
-                activity_d = Activity.query.filter_by(title=activity.title, content=activity.content, date_due=activity.date_due, priority=activity.priority, forClass_quest=activity.forClass_quest, forClass_n_quest=activity.forClass_n_quest, owner=user).first()
-                if activity_d:
-                    db.session.delete(activity_d)
-        else:
-            db.session.delete(activity)
-        db.session.commit()
-        flash('Atividade apagada com sucesso!', 'success')
-        return redirect(url_for('activities'))
-    else:
-        return redirect(url_for('login'))
-
-@app.route("/activities/<int:act_id>/update", methods=['POST', 'GET'])
-def update_act(act_id):
-    if current_user.is_authenticated:
-        activity = Activity.query.get(act_id)
-        form = ActivityForm()
-        if form.validate_on_submit():
-            if form.forClass_n_quest.data and form.forClass_quest.data:
-                flash('Você não pode marcar as duas opções', 'danger')
-                return redirect(url_for('activities'))
-            if form.forClass_quest.data or form.forClass_n_quest.data:
-                users = User.query.filter_by(classITA=current_user.classITA).all()
-                for user in users:
-                    if user.id is not current_user.id:
-                        activity_u = Activity.query.filter_by(title=activity.title, content=activity.content, date_due=activity.date_due, priority=activity.priority, forClass_quest=activity.forClass_quest, forClass_n_quest=activity.forClass_n_quest, user_id=user.id).first()
-                        if activity_u:
-                            activity_u.title = form.title.data
-                            activity_u.content = form.content.data
-                            activity_u.date_due = form.date_due.data
-                            activity_u.priority = form.priority.data
-                            activity_u.forClass_quest = form.forClass_quest.data
-                            activity_u.forClass_n_quest = form.forClass_n_quest.data
-                            activity_u.status = ('Pendente' if form.forClass_quest.data else 'Ativo')
-            activity.title = form.title.data
-            activity.content = form.content.data
-            activity.date_due = form.date_due.data
-            activity.priority = form.priority.data
-            activity.forClass_quest = form.forClass_quest.data
-            activity.forClass_n_quest = form.forClass_n_quest.data
-            activity.progress = form.progress.data
-            db.session.commit()
-            flash('Atividade alterada com sucesso!', 'success')
-            return redirect(url_for('activities'))
-        elif request.method == 'GET':
-            form.title.data = activity.title
-            form.content.data = activity.content
-            form.date_due.data = activity.date_due
-            form.priority.data = activity.priority
-            form.forClass_quest.data = activity.forClass_quest
-            form.forClass_n_quest.data = activity.forClass_n_quest
-            form.progress.data = activity.progress
-        return render_template('new_activity.html', form=form, title='Alterar Atividade')
-    else:
-        return redirect(url_for('login'))
-
-@app.route("/activities/<int:act_id>/update_prog", methods=['POST', 'GET'])
-def update_prog(act_id):
-    if current_user.is_authenticated:
-        activity = Activity.query.get(act_id)
-        form = ActivityForm()
-        if request.method == 'POST':
-            activity.progress = form.progress.data
-            db.session.commit()
-            flash('Progresso alterado com sucesso!', 'success')
-            return redirect(url_for('activities'))
-        elif request.method == 'GET':
-            form.title.data = activity.title
-            form.content.data = activity.content
-            form.date_due.data = activity.date_due
-            form.priority.data = activity.priority
-            form.forClass_quest.data = activity.forClass_quest
-            form.forClass_n_quest.data = activity.forClass_n_quest
-            form.progress.data = activity.progress
-        return render_template('update_progress.html', form=form, title='Alterar Progresso')
-    else:
-        return redirect(url_for('login'))
-
-@app.route("/activities/<int:act_id>/done_act", methods=['POST', 'GET'])
-def done_act(act_id):
-    if current_user.is_authenticated:
-        activity = Activity.query.get(act_id)
-        db.session.delete(activity)
-        db.session.commit()
-        flash('Atividade feita com sucesso!', 'success')
-        return redirect(url_for('activities'))
-    else:
-        return redirect(url_for('login'))
-
-@app.route("/activities_p", methods=['GET', 'POST'])
-def activities_p():
-    if current_user.is_authenticated:
-        activities = Activity.query.filter_by(owner=current_user, status='Pendente').all()
-        if not activities:
-            flash('Você não possui atividades a confirmar no momento.', 'warning')
-        return render_template('activities_p.html',activities=activities)
-    else:
-        return redirect(url_for('login'))
-
-
-@app.route("/activities_p/<int:act_id>/accept", methods=['POST', 'GET'])
-def accept_act(act_id):
-    if current_user.is_authenticated:
-        form = AcceptForm()
-        activity = Activity.query.get(act_id)
-        if form.validate_on_submit():
-            if form.accept.data:
-                users = User.query.filter_by(classITA=current_user.classITA).all()
-                for user in users:
-                    activity_u = Activity.query.filter_by(title=activity.title, content=activity.content, date_due=activity.date_due, priority=activity.priority, forClass_quest=activity.forClass_quest, forClass_n_quest=activity.forClass_n_quest, owner=user).first()
-                    activity_u.votes_up += 1
-                    if activity_u.votes_up >= 0.5*len(users):
-                        activity_u.status = 'Ativo'
-            activity.resp_quest = True
-            db.session.commit()
-            flash('Obrigada pela sua contribuição.', 'success')
-            return redirect(url_for('activities'))
-        return render_template('accept_quest.html', form=form, activity=activity, title='Questionário de aceitação')
-    else:
-        return redirect(url_for('login'))
-
-@app.route("/absences", methods=['POST', 'GET'])
-def absences():
-    if current_user.is_authenticated:
-        subjects = current_user.subjects
-        return render_template('absences.html', subjects=subjects, Absence=Absence, round=round)
-    else:
-        return redirect(url_for('login'))
-
-@app.route("/absences/<int:abs_id>/update", methods=['POST', 'GET'])
-def update_abs(abs_id):
-    if current_user.is_authenticated:
-        absence = Absence.query.get(abs_id)
-        subject = absence.subject
-        return render_template('update_absences.html', absence=absence, subject=subject, round=round)
-    else:
-        return redirect(url_for('login'))
-
-@app.route("/absences/<int:abs_id>/update/<route>", methods=['POST', 'GET'])
-def upd_abs(abs_id,route):
-    if current_user.is_authenticated:
-        absence = Absence.query.get(abs_id)
-        if route == 'AddAtr':
-            absence.abs += 0.5
-        elif route == 'AddFalt':
-            absence.abs += 1
-        elif route == 'AddJust':
-            absence.just += 1
-        elif route == 'RemAtr':
-            if absence.abs < 0.5:
-                flash('Não há atrasos para serem removidos.', 'warning')
-                return redirect(url_for('absences'))
-            else:
-                absence.abs -= 0.5
-        elif route == 'RemFalt':
-            if absence.abs < 1:
-                flash('Não há faltas para serem removidas.', 'warning')
-                return redirect(url_for('absences'))
-            else:
-                absence.abs -= 1
-        elif route == 'RemJust':
-            if absence.just < 1:
-                flash('Não há justificativas para serem removidas.', 'warning')
-                return redirect(url_for('absences'))
-            else:
-                absence.just -= 1
-        db.session.commit()
-        flash('Alterações feitas com sucesso!', 'success')
-        return redirect(url_for('update_abs', abs_id=abs_id))
-    else:
-        return redirect(url_for('login'))
 
 def showAllSubjectsUserRated(subjectsAux):
     subjects = []
@@ -601,8 +641,7 @@ def editRatedSubjects():
             flash('Você não realizou avaliações para poder editá-las. Aproveite e faça sua primeira avaliação!', 'warning')
 
         return render_template('searchalreadyratedsubjects.html', subjects=subjects, form=form)
-    else:
-        return redirect(url_for('login'))
+    return redirect(url_for('login'))
 
 @app.route("/editingratedsubjects/<int:subjId>", methods=['POST', 'GET'])
 def editingRatedSubjects(subjId):
@@ -648,66 +687,7 @@ def editingRatedSubjects(subjId):
             form.evaluationMethod.data = rating.evaluationMethod
             form.comment.data = rating.comment
         return render_template('ratingsubjects.html', subject=subject, teachers=teachers, form=form, title='Editar avaliação')
-    else:
-        return redirect(url_for('login'))
-
-
-def processCellData(monthToDisplay):
-    mon = CalendarMonths.query.filter_by(month=monthToDisplay).first()
-    cell = []
-    currDate = mon.dateToStart
-    numberOfCells = 6*7
-    for i in range(0, numberOfCells):
-        info = []
-        info.append(str(currDate.day))
-        info.append(currDate.month)
-        activities = Activity.query.filter_by(user_id=current_user.id, date_due=currDate, status='Ativo').order_by(Activity.priority.desc()).all()
-        for activity in activities:
-            info.append(activity.title)
-        currDate += timedelta(days=1)
-        cell.append(info)
-    return cell
-
-@app.route("/calendar", defaults={'month': None}, methods=['GET', 'POST'])
-@app.route("/calendar/<int:month>", methods=['GET', 'POST'])
-def calendar(month):
-    if current_user.is_authenticated:
-        if month:
-            monthToDisplay = month
-        else:
-            today = date.today()
-            monthToDisplay = today.month
-
-        if monthToDisplay == 1:
-            monthName = 'Janeiro 2019'
-        elif monthToDisplay == 2:
-            monthName = 'Fevereiro 2019'
-        elif monthToDisplay == 3:
-            monthName = 'Março 2019'
-        elif monthToDisplay == 4:
-            monthName = 'Abril 2019'
-        elif monthToDisplay == 5:
-            monthName = 'Maio 2019'
-        elif monthToDisplay == 6:
-            monthName = 'Junho 2019'
-        elif monthToDisplay == 7:
-            monthName = 'Julho 2019'
-        elif monthToDisplay == 8:
-            monthName = 'Agosto 2019'
-        elif monthToDisplay == 9:
-            monthName = 'Setembro 2019'
-        elif monthToDisplay == 10:
-            monthName = 'Outubro 2019'
-        elif monthToDisplay == 11:
-            monthName = 'Novembro 2019'
-        else:
-            monthName = 'Dezembro 2019'
-
-        cells = processCellData(monthToDisplay)
-
-        return render_template('calendar.html', cells=cells, len=len, monthName=monthName, monthNumber=monthToDisplay)
-    else:
-        return redirect(url_for('login'))
+    return redirect(url_for('login'))
 
 @app.route("/editingratedsubjects/<int:subjId>/delete", methods=['POST', 'GET'])
 def deletingRatedSubjects(subjId):
@@ -734,5 +714,4 @@ def deletingRatedSubjects(subjId):
 
         flash('Avaliação excluída com sucesso!', 'success')
         return redirect(url_for('editRatedSubjects'))
-    else:
-        return redirect(url_for('login'))
+    return redirect(url_for('login'))

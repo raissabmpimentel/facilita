@@ -71,30 +71,6 @@ class Teacher(db.Model):
     def __repr__(self):
         return f"Teacher('{self.title}', '{self.name}', '{self.subjects}')"
 
-class RatingElectiveSubject(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    subjectId = db.Column(db.Integer, db.ForeignKey('subject.id'))
-    raterId = db.Column(db.Integer, db.ForeignKey('user.id'))
-    anonymous = db.Column(db.Boolean, nullable=False)
-    courseware = db.Column(db.Integer, nullable=False)
-    teacherRate = db.Column(db.Integer, nullable=False)
-    finalRate = db.Column(db.Integer, nullable=False)
-    evaluationMethod = db.Column(db.Integer, nullable=False)
-    comment = db.Column(db.Text, nullable=False)
-
-    def __init__(self, subject, rater, anonymous, courseware, teacherRate, evaluationMethod, comment):
-        self.subject = subject
-        self.rater = rater
-        self.anonymous = anonymous
-        self.courseware = courseware
-        self.teacherRate = teacherRate
-        self.evaluationMethod = evaluationMethod
-        self.comment = comment
-        self.finalRate = 0
-
-    def __repr__(self):
-        return f"RateElectiveSubject('{self.title}', '{self.subject}', '{self.rater}', '{self.courseware}', '{self.teacherRate}', '{self.evaluationMethod}', '{self.comment}')"
-
 class Activity(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
@@ -135,3 +111,27 @@ class Absence(db.Model):
 
     def __repr__(self):
         return f"Absences: Total {self.abs} abscences of subject {self.subject_id} of user {self.user_id}"
+
+class RatingElectiveSubject(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    subjectId = db.Column(db.Integer, db.ForeignKey('subject.id'))
+    raterId = db.Column(db.Integer, db.ForeignKey('user.id'))
+    anonymous = db.Column(db.Boolean, nullable=False)
+    courseware = db.Column(db.Integer, nullable=False)
+    teacherRate = db.Column(db.Integer, nullable=False)
+    finalRate = db.Column(db.Integer, nullable=False)
+    evaluationMethod = db.Column(db.Integer, nullable=False)
+    comment = db.Column(db.Text, nullable=False)
+
+    def __init__(self, subject, rater, anonymous, courseware, teacherRate, evaluationMethod, comment):
+        self.subject = subject
+        self.rater = rater
+        self.anonymous = anonymous
+        self.courseware = courseware
+        self.teacherRate = teacherRate
+        self.evaluationMethod = evaluationMethod
+        self.comment = comment
+        self.finalRate = 0
+
+    def __repr__(self):
+        return f"RateElectiveSubject('{self.title}', '{self.subject}', '{self.rater}', '{self.courseware}', '{self.teacherRate}', '{self.evaluationMethod}', '{self.comment}')"

@@ -36,9 +36,6 @@ class LoginForm(FlaskForm):
     remember = BooleanField('Lembrar de mim')
     submit = SubmitField('Login')
 
-class TeacherSearchForm(FlaskForm):
-    teacher = StringField('Nome do professor', validators=[DataRequired()], render_kw={"placeholder": "Digite o nome do professor"})
-    submit = SubmitField('Buscar')
 
 class SubjectSearchForm(FlaskForm):
     #choices = [('name', 'Nome da disciplina'), ('code', 'Sigla da disciplina'), ('teacher', 'Nome do professor')]
@@ -51,14 +48,9 @@ class AddSubjectForm(FlaskForm):
     subject = StringField('Nome da disciplina')
     submit = SubmitField('Buscar')
 
-class RateSubjectForm(FlaskForm):
-    choices = [('1', '1'), ('2', '2'), ('3', '3'), ('4', '4'), ('5', '5')]
-    courseware = SelectField('Material Didático disponibilizado pelo professor:', choices=choices, validators=[DataRequired()])
-    teacherRate = SelectField('Didática do professor:', choices=choices, validators=[DataRequired()])
-    evaluationMethod = SelectField('Método avaliativo da disciplina:', choices=choices, validators=[DataRequired()])
-    anonymous = BooleanField('Desejo que esta avaliação seja anônima')
-    comment = StringField('Comentário', validators=[DataRequired()], render_kw={"placeholder": "Conte mais como foi sua experiência cursando a disciplina."})
-    submit = SubmitField('Enviar')
+class TeacherSearchForm(FlaskForm):
+    teacher = StringField('Nome do professor', validators=[DataRequired()], render_kw={"placeholder": "Digite o nome do professor"})
+    submit = SubmitField('Buscar')
 
 class ActivityForm(FlaskForm):
     choices = [('1', '1'), ('2', '2'), ('3', '3'), ('4', '4'), ('5', '5')]
@@ -75,3 +67,12 @@ class ActivityForm(FlaskForm):
 class AcceptForm(FlaskForm):
     accept = BooleanField('Aceitar sugestão')
     submit = SubmitField('Responder questionário')
+
+class RateSubjectForm(FlaskForm):
+    choices = [('1', '1'), ('2', '2'), ('3', '3'), ('4', '4'), ('5', '5')]
+    courseware = SelectField('Material Didático disponibilizado pelo professor:', choices=choices, validators=[DataRequired()])
+    teacherRate = SelectField('Didática do professor:', choices=choices, validators=[DataRequired()])
+    evaluationMethod = SelectField('Método avaliativo da disciplina:', choices=choices, validators=[DataRequired()])
+    anonymous = BooleanField('Desejo que esta avaliação seja anônima')
+    comment = StringField('Comentário', validators=[DataRequired()], render_kw={"placeholder": "Conte mais como foi sua experiência cursando a disciplina."})
+    submit = SubmitField('Enviar')
