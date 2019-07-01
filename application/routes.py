@@ -65,6 +65,13 @@ def home():
         return render_template('subjects.html', subjects=subjects)
     return redirect(url_for('login'))
 
+@app.route("/editsubjects", methods=['GET'])
+def editSubjects():
+    if current_user.is_authenticated:
+        subjects = current_user.subjects
+        return render_template('editsubjects.html', subjects=subjects)
+    return redirect(url_for('login'))
+
 @app.route("/removesubjects", methods = ["GET", "POST"] )
 def removeSubjects():
     if current_user.is_authenticated:
@@ -80,13 +87,6 @@ def removeSubjects():
             else:
                 flash('É preciso selecionar uma disciplina para removê-la.', 'danger')
             return redirect(url_for('editSubjects'))
-    return redirect(url_for('login'))
-
-@app.route("/editsubjects", methods=['GET'])
-def editSubjects():
-    if current_user.is_authenticated:
-        subjects = current_user.subjects
-        return render_template('editsubjects.html', subjects=subjects)
     return redirect(url_for('login'))
 
 def showAllSubjectsButTheOnesUserIsFollowing(subjectsAux):
@@ -553,7 +553,7 @@ def searchRatedSubjects(orderBy):
             if subjectsAux:
                 subjects = showAllSubjectsRated(subjectsAux)
                 if not subjects:
-                    flash('Você já avaliou ou está cursando todas as disciplinas encontradas com a palavra-chave buscada.', 'warning')
+                    flash('Todas as disciplinas encontradas com a palavra-chave buscada não foram avaliadas ainda.', 'warning')
             else:
                 flash('Disciplina não foi encontrada ou não é eletiva.', 'danger')
         else:
@@ -573,7 +573,7 @@ def searchRatedSubjects(orderBy):
                 subjectsAux = Subject.query.all()
             subjects = showAllSubjectsRated(subjectsAux)
 
-        return render_template('searchratedsubjects.html', subjects=subjects, form=form, round=round, order=order)
+        return render_template('searchratedsubjects.html', subjects=subjects, form=form, round=round, order=order, title='Buscar disciplinas eletivas avaliadas')
     return redirect(url_for('login'))
 
 @app.route("/gettingRatingInfo/<subjId>", methods=['GET', 'POST'])
@@ -631,7 +631,7 @@ def editRatedSubjects():
             if subjectsAux:
                 subjects = showAllSubjectsUserRated(subjectsAux)
                 if not subjects:
-                    flash('Você já avaliou ou está cursando todas as disciplinas encontradas com a palavra-chave buscada.', 'warning')
+                    flash('Você não avaliou nenhuma das disciplinas encontradas com a palavra-chave buscada.', 'warning')
             else:
                 flash('Disciplina não foi encontrada ou não é eletiva.', 'danger')
         else:

@@ -1,41 +1,40 @@
 {% extends "layout.html" %}
 
 {% block navbar %}
-    {% if current_user.is_authenticated %}
-    <ul class="navbar-nav mr-auto">
-      <li class="nav-item">
-        <a class="nav-item nav-link" href="{{ url_for('home') }}">Disciplinas</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-item nav-link" href="{{ url_for('teacher') }}">Professores</a>
-      </li>
-      <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          Atividades
-        </a>
-        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-          <a class="dropdown-item" href="{{ url_for('activities') }}">Ativas</a>
-          <a class="dropdown-item" href="{{ url_for('activities_p') }}">A confirmar</a>
-        </div>
-      </li>
-      <li class="nav-item">
-        <a class="nav-item nav-link" href="{{ url_for('calendar') }}">Calendário</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-item nav-link" href="{{ url_for('absences') }}">Faltas</a>
-      </li>
-      <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          Eletivas
-        </a>
-        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-          <a class="dropdown-item" href="{{ url_for('searchRatedSubjects') }}">Buscar disciplinas eletivas</a>
-          <a class="dropdown-item" href="{{ url_for('rateSubjects') }}">Avaliar disciplinas eletivas</a>
-          <a class="dropdown-item" href="{{ url_for('editRatedSubjects') }}">Editar avaliações realizadas</a>
-        </div>
-      </li>
-    </ul>
-      <a class="nav-item nav-link" style="color:white;" href="{{ url_for('logout') }}">Logout</a>
-
-    {% endif %}
+{% if current_user.is_authenticated %}
+<ul class="navbar-nav mr-auto">
+  <li class="nav-item">
+    <a class="nav-item nav-link" href="{{ url_for('home') }}">Disciplinas</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-item nav-link" href="{{ url_for('teacher') }}">Professores</a>
+  </li>
+  <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      Atividades
+    </a>
+    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+      <a class="dropdown-item" href="{{ url_for('activities') }}">Ativas</a>
+      <a class="dropdown-item" href="{{ url_for('activities_p') }}">A confirmar</a>
+    </div>
+  </li>
+  <li class="nav-item">
+    <a class="nav-item nav-link" href="{{ url_for('calendar') }}">Calendário</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-item nav-link" href="{{ url_for('absences') }}">Faltas</a>
+  </li>
+  <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      Eletivas
+    </a>
+    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+      <a class="dropdown-item" href="{{ url_for('searchRatedSubjects') }}">Buscar disciplinas eletivas</a>
+      <a class="dropdown-item" href="{{ url_for('rateSubjects') }}">Avaliar disciplinas eletivas</a>
+      <a class="dropdown-item" href="{{ url_for('editRatedSubjects') }}">Editar avaliações realizadas</a>
+    </div>
+  </li>
+</ul>
+<a class="nav-item nav-link" style="color:white;" href="{{ url_for('logout') }}">Logout</a>
+{% endif %}
 {% endblock navbar %}

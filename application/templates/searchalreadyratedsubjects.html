@@ -8,52 +8,50 @@
 {% endblock title %}
 
 {% block restofhtml %}
-<p style="font-size:20px; margin-bottom: 20px;">Selecione uma disciplina para visualizar a avaliação:</p>
-<hr width="100%">
-
-  <div>
-    {% for subject in subjects %}
-      {% if (loop.index)%2 == 0 %}
-        <div class="card text-black bg-light mb-3" style="max-width: 1200px;">
-          <div style="display: flex;">
-          <div>
-            <div class="card-body">
-              <p class="card-text"><strong>{{subject.code}}</strong>: {{subject.name}}</p>
-              {% for teacher in subject.teachers %}
-                  {% set displayName = "Prof. " + teacher.name %}
-                  <p><a href="{{ url_for('teacher', routeIdentifier=teacher.routeIdentifier) }}" style="color:black; font-size:15px" class="card-text">{{displayName}}</a></p>
-              {% endfor %}
-            </div>
-          </div>
-          <div style="margin-left: auto;">
-            <div class="card-body">
-                <a class="btn btn-outline-info" href="{{ url_for('editingRatedSubjects', subjId=subject.id) }}" style="color:black" class="card-text">Editar avaliação</a>
-                <a class="btn btn-outline-danger" href="{{ url_for('deletingRatedSubjects', subjId=subject.id) }}" style="color:black" class="card-text">Apagar avaliação</a>
-            </div>
-          </div>
-          </div>
+<p style="font-size:20px; margin-bottom: 20px;">Selecione uma disciplina para editar a avaliação:</p>
+<div>
+{% for subject in subjects %}
+  {% if (loop.index)%2 == 0 %}
+    <div class="card text-black bg-light mb-3" style="max-width: 1200px;">
+      <div style="display: flex;">
+      <div>
+        <div class="card-body">
+          <p class="card-text"><strong>{{subject.code}}</strong>: {{subject.name}}</p>
+          {% for teacher in subject.teachers %}
+              {% set displayName = "Prof. " + teacher.name %}
+              <p><a href="{{ url_for('teacher', routeIdentifier=teacher.routeIdentifier) }}" style="color:black; font-size:15px" class="card-text">{{displayName}}</a></p>
+          {% endfor %}
         </div>
-      {% else %}
-        <div class="card text-white bg-dark mb-3" style="max-width: 1200px;">
-          <div style="display: flex;">
-          <div>
-            <div class="card-body">
-              <p class="card-text"><strong>{{subject.code}}</strong>: {{subject.name}}</p>
-              {% for teacher in subject.teachers %}
-                  {% set displayName = "Prof. " + teacher.name %}
-                  <p><a href="{{ url_for('teacher', routeIdentifier=teacher.routeIdentifier) }}" style="color:white; font-size:15px" class="card-text">{{displayName}}</a></p>
-              {% endfor %}
-            </div>
-          </div>
-          <div style="margin-left: auto;">
-            <div class="card-body">
-                <a class="btn btn-outline-info" href="{{ url_for('editingRatedSubjects', subjId=subject.id) }}" style="color:white" class="card-text">Editar avaliação</a>
-                <a class="btn btn-outline-danger" href="{{ url_for('deletingRatedSubjects', subjId=subject.id) }}" style="color:white" class="card-text">Apagar avaliação</a>
-            </div>
-          </div>
-          </div>
+      </div>
+      <div style="margin-left: auto;">
+        <div class="card-body">
+            <a class="btn btn-outline-info" href="{{ url_for('editingRatedSubjects', subjId=subject.id) }}" style="color:black" class="card-text">Editar avaliação</a>
+            <a class="btn btn-outline-danger" href="{{ url_for('deletingRatedSubjects', subjId=subject.id) }}" style="color:black" class="card-text">Apagar avaliação</a>
         </div>
-      {% endif %}
-  {% endfor %}
+      </div>
+      </div>
+    </div>
+  {% else %}
+  <div class="card text-white bg-dark mb-3" style="max-width: 1200px;">
+    <div style="display: flex;">
+    <div>
+      <div class="card-body">
+        <p class="card-text"><strong>{{subject.code}}</strong>: {{subject.name}}</p>
+        {% for teacher in subject.teachers %}
+            {% set displayName = "Prof. " + teacher.name %}
+            <p><a href="{{ url_for('teacher', routeIdentifier=teacher.routeIdentifier) }}" style="color:white; font-size:15px" class="card-text">{{displayName}}</a></p>
+        {% endfor %}
+      </div>
+    </div>
+    <div style="margin-left: auto;">
+      <div class="card-body">
+          <a class="btn btn-outline-info" href="{{ url_for('editingRatedSubjects', subjId=subject.id) }}" style="color:white" class="card-text">Editar avaliação</a>
+          <a class="btn btn-outline-danger" href="{{ url_for('deletingRatedSubjects', subjId=subject.id) }}" style="color:white" class="card-text">Apagar avaliação</a>
+      </div>
+    </div>
+    </div>
   </div>
+  {% endif %}
+{% endfor %}
+</div>
 {% endblock restofhtml %}

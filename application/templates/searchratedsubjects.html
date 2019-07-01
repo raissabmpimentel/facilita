@@ -1,17 +1,17 @@
 {% extends "searchsubject.html" %}
 
 {% block title %}
-  <div>
-    <h2>Busca de disciplinas eletivas</h2>
-  </div>
-  <hr width="100%">
+<div>
+  <h2>Busca de disciplinas eletivas</h2>
+</div>
+<hr width="100%">
 {% endblock title %}
 
 {% block restofhtml %}
 
 <div style="display: flex;">
 <div>
-<p style="font-size:20px; margin-bottom: 20px;">Selecione uma disciplina para visualizar a avaliação:</p>
+  <p style="font-size:20px; margin-bottom: 20px;">Selecione uma disciplina para visualizar a avaliação:</p>
 </div>
 <div style="margin-left: auto;">
   <div class="dropdown">
@@ -28,65 +28,65 @@
 </div>
 </div>
 
-  <div>
-    {% for subject in subjects %}
-      {% if (loop.index)%2 == 0 %}
-        <div class="card text-black bg-light mb-3" style="max-width: 1200px;">
-          <div style="display: flex;">
-          <div>
-            <div class="card-body">
-              <p class="card-text"><strong>{{subject.code}}</strong>: {{subject.name}}</p>
-              {% for teacher in subject.teachers %}
-                  {% set displayName = "Prof. " + teacher.name %}
-                  <p><a href="{{ url_for('teacher', routeIdentifier=teacher.routeIdentifier) }}" style="color:black; font-size:15px" class="card-text">{{displayName}}</a></p>
-              {% endfor %}
-            </div>
-          </div>
-          <div style="margin-left: auto;">
-            <div class="card-body">
-              {% if order == 'finalRate' %}
-                <p class="card-text">Média: {{round(subject.finalRate, 1)}}</p>
-              {% elif order == 'teacherRate' %}
-                <p class="card-text">Média: {{round(subject.teachersRate, 1)}}</p>
-              {% elif order == 'coursewareRate' %}
-              <p class="card-text">Média: {{round(subject.coursewareRate, 1)}}</p>
-              {% else %}
-              <p class="card-text">Média: {{round(subject.evaluationMethodRate, 1)}}</p>
-              {% endif %}
-                <a class="btn btn-outline-info" href="{{ url_for('gettingRatingInfo', subjId=subject.id) }}" style="color:black" class="card-text">Visualizar avaliação</a>
-            </div>
-          </div>
-          </div>
+<div>
+{% for subject in subjects %}
+  {% if (loop.index)%2 == 0 %}
+    <div class="card text-black bg-light mb-3" style="max-width: 1200px;">
+      <div style="display: flex;">
+      <div>
+        <div class="card-body">
+          <p class="card-text"><strong>{{subject.code}}</strong>: {{subject.name}}</p>
+          {% for teacher in subject.teachers %}
+              {% set displayName = "Prof. " + teacher.name %}
+              <p><a href="{{ url_for('teacher', routeIdentifier=teacher.routeIdentifier) }}" style="color:black; font-size:15px" class="card-text">{{displayName}}</a></p>
+          {% endfor %}
         </div>
-      {% else %}
-        <div class="card text-white bg-dark mb-3" style="max-width: 1200px;">
-          <div style="display: flex;">
-          <div>
-            <div class="card-body">
-              <p class="card-text"><strong>{{subject.code}}</strong>: {{subject.name}}</p>
-              {% for teacher in subject.teachers %}
-                  {% set displayName = "Prof. " + teacher.name %}
-                  <p><a href="{{ url_for('teacher', routeIdentifier=teacher.routeIdentifier) }}" style="color:white; font-size:15px" class="card-text">{{displayName}}</a></p>
-              {% endfor %}
-            </div>
-          </div>
-          <div style="margin-left: auto;">
-            <div class="card-body">
-              {% if order == 'finalRate' %}
-                <p class="card-text">Média: {{round(subject.finalRate, 1)}}</p>
-              {% elif order == 'teacherRate' %}
-                <p class="card-text">Média: {{round(subject.teachersRate, 1)}}</p>
-              {% elif order == 'coursewareRate' %}
-              <p class="card-text">Média: {{round(subject.coursewareRate, 1)}}</p>
-              {% else %}
-              <p class="card-text">Média: {{round(subject.evaluationMethodRate, 1)}}</p>
-              {% endif %}
-                <a class="btn btn-outline-info" href="{{ url_for('gettingRatingInfo', subjId=subject.id) }}" style="color:white" class="card-text">Visualizar avaliação</a>
-            </div>
-          </div>
-          </div>
+      </div>
+      <div style="margin-left: auto;">
+        <div class="card-body">
+          {% if order == 'finalRate' %}
+            <p class="card-text">Média: {{round(subject.finalRate, 1)}}</p>
+          {% elif order == 'teacherRate' %}
+            <p class="card-text">Média: {{round(subject.teachersRate, 1)}}</p>
+          {% elif order == 'coursewareRate' %}
+          <p class="card-text">Média: {{round(subject.coursewareRate, 1)}}</p>
+          {% else %}
+          <p class="card-text">Média: {{round(subject.evaluationMethodRate, 1)}}</p>
+          {% endif %}
+            <a class="btn btn-outline-info" href="{{ url_for('gettingRatingInfo', subjId=subject.id) }}" style="color:black" class="card-text">Visualizar avaliação</a>
         </div>
-      {% endif %}
-  {% endfor %}
-  </div>
+      </div>
+      </div>
+    </div>
+    {% else %}
+    <div class="card text-white bg-dark mb-3" style="max-width: 1200px;">
+      <div style="display: flex;">
+      <div>
+        <div class="card-body">
+          <p class="card-text"><strong>{{subject.code}}</strong>: {{subject.name}}</p>
+          {% for teacher in subject.teachers %}
+              {% set displayName = "Prof. " + teacher.name %}
+              <p><a href="{{ url_for('teacher', routeIdentifier=teacher.routeIdentifier) }}" style="color:white; font-size:15px" class="card-text">{{displayName}}</a></p>
+          {% endfor %}
+        </div>
+      </div>
+      <div style="margin-left: auto;">
+        <div class="card-body">
+          {% if order == 'finalRate' %}
+            <p class="card-text">Média: {{round(subject.finalRate, 1)}}</p>
+          {% elif order == 'teacherRate' %}
+            <p class="card-text">Média: {{round(subject.teachersRate, 1)}}</p>
+          {% elif order == 'coursewareRate' %}
+          <p class="card-text">Média: {{round(subject.coursewareRate, 1)}}</p>
+          {% else %}
+          <p class="card-text">Média: {{round(subject.evaluationMethodRate, 1)}}</p>
+          {% endif %}
+            <a class="btn btn-outline-info" href="{{ url_for('gettingRatingInfo', subjId=subject.id) }}" style="color:white" class="card-text">Visualizar avaliação</a>
+        </div>
+      </div>
+      </div>
+    </div>
+    {% endif %}
+{% endfor %}
+</div>
 {% endblock restofhtml %}
